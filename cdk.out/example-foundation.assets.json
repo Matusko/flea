@@ -1,0 +1,20 @@
+{
+  "version": "33.0.0",
+  "files": {
+    "dbdec2eb975b74b2fad70cb3a9ec986c708597dd480c8fa1350e29d96b3921be": {
+      "source": {
+        "path": "example-foundation.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "588476158895-eu-central-1": {
+          "bucketName": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+          "objectKey": "dbdec2eb975b74b2fad70cb3a9ec986c708597dd480c8fa1350e29d96b3921be.json",
+          "region": "eu-central-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-file-publishing-role-588476158895-eu-central-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

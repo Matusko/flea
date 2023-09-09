@@ -1,0 +1,301 @@
+{
+ "Resources": {
+  "exampleadminadminbucketD411474B": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Resource"
+   }
+  },
+  "exampleadminadminbucketPolicy6E1DF9C3": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "exampleadminadminbucketD411474B"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "exampleadminadminbucketD411474B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "exampleadminadminbucketD411474B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Policy/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "MyApi"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayCloudWatchRole49FB2841": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/CloudWatchRole/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayAccountD1AB3699": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "examplepublicgatewaypublicgatewaypublicrestgatewayCloudWatchRole49FB2841",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Account"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD9e8748915956f24dba6af9bbb91a3a481": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+    }
+   },
+   "DependsOn": [
+    "examplepublicgatewaypublicgatewaypublicrestgatewayhealthGET49D02937",
+    "examplepublicgatewaypublicgatewaypublicrestgatewayhealth5A4EB55A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Deployment/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayDeploymentStageprodD7D6D89C": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD9e8748915956f24dba6af9bbb91a3a481"
+    },
+    "RestApiId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "examplepublicgatewaypublicgatewaypublicrestgatewayAccountD1AB3699"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/DeploymentStage.prod/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayhealth5A4EB55A": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "health",
+    "RestApiId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/Resource"
+   }
+  },
+  "examplepublicgatewaypublicgatewaypublicrestgatewayhealthGET49D02937": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "{\"status\": \"OK\"}"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "PassthroughBehavior": "NEVER",
+     "RequestTemplates": {
+      "application/json": "{ \"statusCode\": 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayhealth5A4EB55A"
+    },
+    "RestApiId": {
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQUQ+CIBSFf0vvSFpbW49ar61mP6AR3gxFYAI5x/jvYbhpT+c7Z/ce7tjhY4rTDRl0Qqs24eyJ3d0Q2qIQPZzeY1dY2oJBp5eYKcpNckbHJY7eI6JYTQwMZMSuBG1yxaahFeaUSisMOoPicuxA/MpXLhxQw5RFCKvS9hQKohczd0a+gHnLaooiecRIF56XPM4F9f5v9WqNsmZd4pGQFeBGbz/ZAWfTrzSasaQPp7IOcBn1C4GxFawxAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "examplepublicgatewaypublicgatewaypublicrestgatewayEndpoint45077586": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+      },
+      ".execute-api.eu-central-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeploymentStageprodD7D6D89C"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
