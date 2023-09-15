@@ -7,6 +7,6 @@ export class FleaFoundation extends Construct {
     super(scope, id);
 
     new FleaAdmin(this, 'admin');
-    new FleaRESTGateway(this, 'public-gateway')
+    new FleaRESTGateway(this, 'public-gateway');
   }
 }

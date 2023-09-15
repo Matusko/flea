@@ -1,0 +1,468 @@
+{
+ "Resources": {
+  "petseventstore81DA8DE9": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    },
+    "StreamSpecification": {
+     "StreamViewType": "NEW_IMAGE"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/event-store/event-store/Resource"
+   }
+  },
+  "petsdomaineventbus4C3E1981": {
+   "Type": "AWS::Events::EventBus",
+   "Properties": {
+    "Name": "pets"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/domain-event-bus/event-bus/Resource"
+   }
+  },
+  "petsdomaineventbusPipeRole6F932D1F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "pipes.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::GetAtt": [
+           "petseventstore81DA8DE9",
+           "StreamArn"
+          ]
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "sourcePolicy"
+     },
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "events:PutEvents",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::GetAtt": [
+           "petsdomaineventbus4C3E1981",
+           "Arn"
+          ]
+         }
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "targetPolicy"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/domain-event-bus/PipeRole/Resource"
+   }
+  },
+  "petsdomaineventbuspipeAAF16DBD": {
+   "Type": "AWS::Pipes::Pipe",
+   "Properties": {
+    "Name": "SampleTableModifyPipe",
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "petsdomaineventbusPipeRole6F932D1F",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "Fn::GetAtt": [
+      "petseventstore81DA8DE9",
+      "StreamArn"
+     ]
+    },
+    "SourceParameters": {
+     "DynamoDBStreamParameters": {
+      "BatchSize": 1,
+      "StartingPosition": "LATEST"
+     }
+    },
+    "Target": {
+     "Fn::GetAtt": [
+      "petsdomaineventbus4C3E1981",
+      "Arn"
+     ]
+    },
+    "TargetParameters": {
+     "EventBridgeEventBusParameters": {
+      "DetailType": "SampleTableModified",
+      "Source": "com.sample"
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/domain-event-bus/pipe"
+   }
+  },
+  "petspublicrestgatewayrootresourcepets31A0AEB9": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": "zu9qs4uwok",
+    "PathPart": "pets",
+    "RestApiId": "9wejt4xyxa"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/public-rest-gateway-root-resource/pets/Resource"
+   }
+  },
+  "petspublicrestgatewayrootresourcepetsPUTF1DB4E33": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "PUT",
+    "Integration": {
+     "Credentials": {
+      "Fn::GetAtt": [
+       "petseventstoreintegrationputEventRoleB3FE91FB",
+       "Arn"
+      ]
+     },
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseTemplates": {
+        "application/json": "{\n                \"requestId\": \"$context.requestId\"\n              }"
+       },
+       "StatusCode": "202"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": {
+       "Fn::Join": [
+        "",
+        [
+         "{\n              \"Item\": {\n                \"id\": {\n                  \"S\": \"$context.requestId\"\n                },\n                \"Name\": {\n                  \"S\": \"$input.path('$.name')\"\n                },\n                \"Color\": {\n                  \"S\": \"$input.path('$.color')\"\n                }\n              },\n              \"TableName\": \"",
+         {
+          "Ref": "petseventstore81DA8DE9"
+         },
+         "\"\n            }"
+        ]
+       ]
+      }
+     },
+     "Type": "AWS",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:eu-central-1:dynamodb:action/PutItem"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "StatusCode": "202"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "petspublicrestgatewayrootresourcepets31A0AEB9"
+    },
+    "RestApiId": "9wejt4xyxa"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/public-rest-gateway-root-resource/pets/PUT/Resource"
+   }
+  },
+  "petseventstoreintegrationputEventPolicy1B4823B4": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:PutItem",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "petseventstore81DA8DE9",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "petseventstoreintegrationputEventPolicy1B4823B4",
+    "Roles": [
+     {
+      "Ref": "petseventstoreintegrationputEventRoleB3FE91FB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/event-store-integration/putEventPolicy/Resource"
+   }
+  },
+  "petseventstoreintegrationputEventRoleB3FE91FB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/event-store-integration/putEventRole/Resource"
+   }
+  },
+  "petseventstoreintegrationpublicrestgatewaydeployment83D842F5b9ed01e525f499811e256bed44b754cc": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Fri Sep 15 2023",
+    "RestApiId": "9wejt4xyxa",
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "petspublicrestgatewayrootresourcepetsPUTF1DB4E33",
+    "petspublicrestgatewayrootresourcepets31A0AEB9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/event-store-integration/public-rest-gateway-deployment/Resource"
+   }
+  },
+  "petsreadmodelreadmodeltableD745A283": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    },
+    "TableName": "pets"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/read-model/read-model-table/Resource"
+   }
+  },
+  "petsreadmodeleventlistenerServiceRole6AEE490E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/read-model/event-listener/ServiceRole/Resource"
+   }
+  },
+  "petsreadmodeleventlistenerAAF55874": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+     "S3Key": "59c3d25538a2f9b6d4bbe2e5920f31c4c09ae95a5186ddf5603281f17d06d365.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "FunctionName": "pets-event-handler",
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "petsreadmodeleventlistenerServiceRole6AEE490E",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x"
+   },
+   "DependsOn": [
+    "petsreadmodeleventlistenerServiceRole6AEE490E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/read-model/event-listener/Resource",
+    "aws:asset:path": "asset.59c3d25538a2f9b6d4bbe2e5920f31c4c09ae95a5186ddf5603281f17d06d365",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "petsreadmodelrule244915A4": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "EventBusName": {
+     "Ref": "petsdomaineventbus4C3E1981"
+    },
+    "EventPattern": {
+     "source": [
+      "com.sample"
+     ]
+    },
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "petsreadmodeleventlistenerAAF55874",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/read-model/rule/Resource"
+   }
+  },
+  "petsreadmodelruleAllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E8746F5A0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "petsreadmodeleventlistenerAAF55874",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "petsreadmodelrule244915A4",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/read-model/rule/AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRS0/DMAz+LdxTs4GExHHlcQOhwr1yE7OlbZKqTjZVVf47STs2OH2PxPbn5A4eN7C5wRMXUnVFrxuYPz3KTiSrntVk0TiVzC9sehJP33YhUdCRrGeYXzKWgfPRhVdhvZsxCo0G5sqdrYwfrtdyynJlUQx6IIZsJCJw0Hv0dMIpFRL73aBLZBKJuzBK+ieWrr/8jfzBqWyd2TMNvZtMCpbNq4qiR9MorK1T1DK8L/AarPTaWcH3NTJT2nCXIWkog+zIL6PXUphTx0tFzk6j0cxJxXiNtzRIb7rXdv83axR5NLR8e9w+wDZ/Q8taF2OwXhuCasUfkP8GqqIBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

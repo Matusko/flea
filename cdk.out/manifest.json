@@ -1,27 +1,27 @@
 {
   "version": "33.0.0",
   "artifacts": {
-    "example-foundation.assets": {
+    "example-pets.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
-        "file": "example-foundation.assets.json",
+        "file": "example-pets.assets.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
       }
     },
-    "example-foundation": {
+    "example-pets": {
       "type": "aws:cloudformation:stack",
       "environment": "aws://588476158895/eu-central-1",
       "properties": {
-        "templateFile": "example-foundation.template.json",
+        "templateFile": "example-pets.template.json",
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-deploy-role-588476158895-eu-central-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-cfn-exec-role-588476158895-eu-central-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/dbdec2eb975b74b2fad70cb3a9ec986c708597dd480c8fa1350e29d96b3921be.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/9e8840b3958bd6ecfb618e70cde96500af5a6989a85550420941289378815441.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
-          "example-foundation.assets"
+          "example-pets.assets"
         ],
         "lookupRole": {
           "arn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-lookup-role-588476158895-eu-central-1",
@@ -30,89 +30,121 @@
         }
       },
       "dependencies": [
-        "example-foundation.assets"
+        "example-pets.assets"
       ],
       "metadata": {
-        "/example-foundation/example/admin-admin-bucket/Resource": [
+        "/example-pets/pets/event-store/event-store/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "exampleadminadminbucketD411474B"
+            "data": "petseventstore81DA8DE9"
           }
         ],
-        "/example-foundation/example/admin-admin-bucket/Policy/Resource": [
+        "/example-pets/pets/domain-event-bus/event-bus/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "exampleadminadminbucketPolicy6E1DF9C3"
+            "data": "petsdomaineventbus4C3E1981"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Resource": [
+        "/example-pets/pets/domain-event-bus/PipeRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+            "data": "petsdomaineventbusPipeRole6F932D1F"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/CloudWatchRole/Resource": [
+        "/example-pets/pets/domain-event-bus/pipe": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayCloudWatchRole49FB2841"
+            "data": "petsdomaineventbuspipeAAF16DBD"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Account": [
+        "/example-pets/pets/public-rest-gateway-root-resource/pets/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayAccountD1AB3699"
+            "data": "petspublicrestgatewayrootresourcepets31A0AEB9"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Deployment/Resource": [
+        "/example-pets/pets/public-rest-gateway-root-resource/pets/PUT/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD9e8748915956f24dba6af9bbb91a3a481"
+            "data": "petspublicrestgatewayrootresourcepetsPUTF1DB4E33"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/DeploymentStage.prod/Resource": [
+        "/example-pets/pets/event-store-integration/putEventPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayDeploymentStageprodD7D6D89C"
+            "data": "petseventstoreintegrationputEventPolicy1B4823B4"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Endpoint": [
+        "/example-pets/pets/event-store-integration/putEventRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayEndpoint45077586"
+            "data": "petseventstoreintegrationputEventRoleB3FE91FB"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/Resource": [
+        "/example-pets/pets/event-store-integration/public-rest-gateway-deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayhealth5A4EB55A"
+            "data": "petseventstoreintegrationpublicrestgatewaydeployment83D842F5b9ed01e525f499811e256bed44b754cc"
           }
         ],
-        "/example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET/Resource": [
+        "/example-pets/pets/read-model/read-model-table": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "petsreadmodelreadmodeltableD745A283"
+            }
+          }
+        ],
+        "/example-pets/pets/read-model/read-model-table/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "examplepublicgatewaypublicgatewaypublicrestgatewayhealthGET49D02937"
+            "data": "petsreadmodelreadmodeltableD745A283"
           }
         ],
-        "/example-foundation/CDKMetadata/Default": [
+        "/example-pets/pets/read-model/event-listener/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petsreadmodeleventlistenerServiceRole6AEE490E"
+          }
+        ],
+        "/example-pets/pets/read-model/event-listener/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petsreadmodeleventlistenerAAF55874"
+          }
+        ],
+        "/example-pets/pets/read-model/rule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petsreadmodelrule244915A4"
+          }
+        ],
+        "/example-pets/pets/read-model/rule/AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petsreadmodelruleAllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E8746F5A0"
+          }
+        ],
+        "/example-pets/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadata"
           }
         ],
-        "/example-foundation/BootstrapVersion": [
+        "/example-pets/BootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "BootstrapVersion"
           }
         ],
-        "/example-foundation/CheckBootstrapVersion": [
+        "/example-pets/CheckBootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CheckBootstrapVersion"
           }
         ]
       },
-      "displayName": "example-foundation"
+      "displayName": "example-pets"
     },
     "Tree": {
       "type": "cdk:tree",
