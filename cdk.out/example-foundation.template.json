@@ -1,83 +1,5 @@
 {
  "Resources": {
-  "exampleadminadminbucketD411474B": {
-   "Type": "AWS::S3::Bucket",
-   "Properties": {
-    "BucketEncryption": {
-     "ServerSideEncryptionConfiguration": [
-      {
-       "ServerSideEncryptionByDefault": {
-        "SSEAlgorithm": "AES256"
-       }
-      }
-     ]
-    },
-    "PublicAccessBlockConfiguration": {
-     "BlockPublicAcls": true,
-     "BlockPublicPolicy": true,
-     "IgnorePublicAcls": true,
-     "RestrictPublicBuckets": true
-    },
-    "VersioningConfiguration": {
-     "Status": "Enabled"
-    }
-   },
-   "UpdateReplacePolicy": "Retain",
-   "DeletionPolicy": "Retain",
-   "Metadata": {
-    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Resource"
-   }
-  },
-  "exampleadminadminbucketPolicy6E1DF9C3": {
-   "Type": "AWS::S3::BucketPolicy",
-   "Properties": {
-    "Bucket": {
-     "Ref": "exampleadminadminbucketD411474B"
-    },
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "s3:*",
-       "Condition": {
-        "Bool": {
-         "aws:SecureTransport": "false"
-        }
-       },
-       "Effect": "Deny",
-       "Principal": {
-        "AWS": "*"
-       },
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "exampleadminadminbucketD411474B",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Fn::GetAtt": [
-             "exampleadminadminbucketD411474B",
-             "Arn"
-            ]
-           },
-           "/*"
-          ]
-         ]
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Policy/Resource"
-   }
-  },
   "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5": {
    "Type": "AWS::ApiGateway::RestApi",
    "Properties": {
@@ -230,10 +152,265 @@
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET/Resource"
    }
   },
+  "exampleadminadminbucketD411474B": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Resource"
+   }
+  },
+  "exampleadminadminbucketPolicy6E1DF9C3": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "exampleadminadminbucketD411474B"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "exampleadminadminbucketD411474B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "exampleadminadminbucketD411474B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Policy/Resource"
+   }
+  },
+  "examplepublicbuswsgatewayconnecthandlerServiceRole03B66F9D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/connect-handler/ServiceRole/Resource"
+   }
+  },
+  "examplepublicbuswsgatewayconnecthandler56032D0E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+     "S3Key": "192b490b4f31a84f662da801ecaafac9ef738bf52f2746712938ef2e323888c3.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "FunctionName": "public-bus-connect-handler",
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "examplepublicbuswsgatewayconnecthandlerServiceRole03B66F9D",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs16.x"
+   },
+   "DependsOn": [
+    "examplepublicbuswsgatewayconnecthandlerServiceRole03B66F9D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/connect-handler/Resource",
+    "aws:asset:path": "asset.192b490b4f31a84f662da801ecaafac9ef738bf52f2746712938ef2e323888c3",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "examplepublicbuswsgatewaymywsapi0A506069": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Name": "mywsapi",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/mywsapi/Resource"
+   }
+  },
+  "examplepublicbuswsgatewaymywsapiconnectRouteconnetchandlerintegrationPermissionA9414042": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "examplepublicbuswsgatewayconnecthandler56032D0E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:eu-central-1:588476158895:",
+       {
+        "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
+       },
+       "/*$connect"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/connetc-handler-integration-Permission"
+   }
+  },
+  "examplepublicbuswsgatewaymywsapiconnectRouteconnetchandlerintegrationB51C8F71": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:eu-central-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "examplepublicbuswsgatewayconnecthandler56032D0E",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/connetc-handler-integration/Resource"
+   }
+  },
+  "examplepublicbuswsgatewaymywsapiconnectRoute58976C8A": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "examplepublicbuswsgatewaymywsapiconnectRouteconnetchandlerintegrationB51C8F71"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/Resource"
+   }
+  },
+  "examplepublicbuswsgatewaymystage3E62A1AB": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
+    },
+    "AutoDeploy": true,
+    "StageName": "prod"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/mystage/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WQUQ+CIBSFf0vvSFpbW49ar61mP6AR3gxFYAI5x/jvYbhpT+c7Z/ce7tjhY4rTDRl0Qqs24eyJ3d0Q2qIQPZzeY1dY2oJBp5eYKcpNckbHJY7eI6JYTQwMZMSuBG1yxaahFeaUSisMOoPicuxA/MpXLhxQw5RFCKvS9hQKohczd0a+gHnLaooiecRIF56XPM4F9f5v9WqNsmZd4pGQFeBGbz/ZAWfTrzSasaQPp7IOcBn1C4GxFawxAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRTXPCIBD9Ld4JJnrpsdqOMz20dfTQo4NkG4kJZALoOAz/vUvAJD29D5Z9y7KiRZFTly/YXWe8vGaNOFN3NIxfCVonxzpRMQN39qDuANpsOkHefuWMbjhXVhryDl2jHi0gRXemsFsFwYsEryrbc9gyPYnUM/JPMBdVBisyTwRrMV41sQ7RE72mbmv5FYa4xCLsVSP4Y7KTjiLEetKw9lyyk1Ql1Jp+DbCzkhuhJLY+Ma3BaLoJkIqpw4ZjDfI99K3QGpUn05puq6EwLedDGqh69rxyUNZMq/D+3/u/remsIUNmOBeymq/FkzxjTXdhNF+8pu9aBpxnpwr3A+ejCs8Nc4wixo9yPtxoPicLq6G1Xt6KF1qsMbPWQmQ9/rRogR4i/gFhALLXPwIAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/CDKMetadata/Default"

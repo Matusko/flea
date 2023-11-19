@@ -4,6 +4,9 @@ export class AppStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    new FleaFoundation(this, 'example');
+    new FleaFoundation(this, 'example', {
+      enablePublicBus: true,
+      enableAdmin: true
+    });
   }
 }

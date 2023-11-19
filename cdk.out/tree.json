@@ -587,6 +587,45 @@
                               "fqn": "aws-cdk-lib.aws_iam.CfnRole",
                               "version": "2.110.0"
                             }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "example-pets/pets/read-model/event-listener/ServiceRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "example-pets/pets/read-model/event-listener/ServiceRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": "execute-api:ManageConnections",
+                                          "Effect": "Allow",
+                                          "Resource": "arn:aws:execute-api:eu-central-1:588476158895:876ro4w8qd/prod/POST/@connections/*"
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "petsreadmodeleventlistenerServiceRoleDefaultPolicyFAD3089B",
+                                    "roles": [
+                                      {
+                                        "Ref": "petsreadmodeleventlistenerServiceRole6AEE490E"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.110.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.110.0"
+                            }
                           }
                         },
                         "constructInfo": {
@@ -628,7 +667,7 @@
                           "aws:cdk:cloudformation:props": {
                             "code": {
                               "s3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
-                              "s3Key": "4ea5e6b625bf22d9a1a63f1ddd25f936b66fc0838a0e5dd1cb87346e596c00fa.zip"
+                              "s3Key": "21d76d1f9ba551495bcab474edc69c960a81650d47229ff4314ae8307a8e02aa.zip"
                             },
                             "environment": {
                               "variables": {

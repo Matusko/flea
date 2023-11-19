@@ -18,7 +18,8 @@
       "@flea/core-infra": ["libs/flea/core-infra/src/index.ts"],
       "@flea/domain-infra": ["libs/flea/domain-infra/src/index.ts"],
       "@flea/event-modeling": ["libs/flea/event-modeling/src/index.ts"],
-      "@flea/example/pets-api": ["libs/example/pets-api/src/index.ts"]
+      "@flea/example/pets-api": ["libs/example/pets-api/src/index.ts"],
+      "@flea/public-bus": ["libs/flea/public-bus/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

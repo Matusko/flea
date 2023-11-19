@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-deploy-role-588476158895-eu-central-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-cfn-exec-role-588476158895-eu-central-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/cfa430a52ead7c10e8442e297e0df79ff2cdca61faaba7129c82ca44446a3e76.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/8df52c4b581fc7867a50ac0ec940f069fbf2492f320f5239304a75c170d21425.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -106,6 +106,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "petsreadmodeleventlistenerServiceRole6AEE490E"
+          }
+        ],
+        "/example-pets/pets/read-model/event-listener/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petsreadmodeleventlistenerServiceRoleDefaultPolicyFAD3089B"
           }
         ],
         "/example-pets/pets/read-model/event-listener/Resource": [

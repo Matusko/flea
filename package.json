@@ -58,10 +58,14 @@
     "@angular/platform-browser-dynamic": "~17.0.1",
     "@angular/router": "~17.0.1",
     "@asyncapi/parser": "^2.1.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.110.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.110.0-alpha.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.454.0",
     "aws-cdk": "^2.77.0",
     "aws-cdk-lib": "^2.77.0",
     "constructs": "^10.2.10",
     "rxjs": "~7.8.0",
+    "rxjs-websockets": "^9.0.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.0"
   }

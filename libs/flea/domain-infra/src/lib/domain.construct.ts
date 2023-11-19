@@ -3,7 +3,7 @@ import {FleaEventStore} from './event-store.construct';
 import {FleaEventStorePublicGatewayIntegration} from './public-rest-gateway-integration.construct';
 import {Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {FleaEventBus} from './event-bus.construct';
-import {FleaReadModel, FleaReadModelProps} from './read-model.construct';
+import {FleaReadModel, FleaReadModelProps, ReadModelPublicBusIntegrationProps} from './read-model.construct';
 import {NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 
 export interface FleaDomainProps {
@@ -13,6 +13,7 @@ export interface FleaDomainProps {
   domainResourcePath: string;
   readModelTableName: string;
   eventListenerProps: NodejsFunctionProps;
+  readModelPublicBusIntegrationProps: ReadModelPublicBusIntegrationProps;
 }
 
 export class FleaDomain extends Construct {
@@ -46,7 +47,8 @@ export class FleaDomain extends Construct {
     new FleaReadModel(this, 'read-model', {
       tableName: props.readModelTableName,
       eventListenerProps: props.eventListenerProps,
-      eventBus: eventBus.bus
+      eventBus: eventBus.bus,
+      publicBus: props.readModelPublicBusIntegrationProps,
     });
 
   }

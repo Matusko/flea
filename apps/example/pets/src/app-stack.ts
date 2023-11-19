@@ -16,6 +16,12 @@ export class AppStack extends Stack {
       eventListenerProps: {
         functionName: 'pets-event-handler',
         entry: path.join(__dirname, 'lambda/index.ts'),
+      },
+      readModelPublicBusIntegrationProps: {
+        region: props.env.region,
+        account: props.env.account,
+        stage: 'prod',
+        webSocketApiId: '876ro4w8qd'
       }
     });
 
