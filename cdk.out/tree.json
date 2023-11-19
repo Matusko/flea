@@ -49,7 +49,7 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "ScalingRole": {
@@ -57,19 +57,19 @@
                         "path": "example-pets/pets/event-store/event-store/ScalingRole",
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.Resource",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_dynamodb.Table",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "constructs.Construct",
-                  "version": "10.2.69"
+                  "version": "10.3.0"
                 }
               },
               "domain-event-bus": {
@@ -86,18 +86,18 @@
                         "attributes": {
                           "aws:cdk:cloudformation:type": "AWS::Events::EventBus",
                           "aws:cdk:cloudformation:props": {
-                            "name": "pets"
+                            "name": "pets2"
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_events.CfnEventBus",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_events.EventBus",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "PipeRole": {
@@ -109,7 +109,7 @@
                         "path": "example-pets/pets/domain-event-bus/PipeRole/ImportPipeRole",
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.Resource",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "Resource": {
@@ -177,13 +177,13 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.Role",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "pipe": {
@@ -227,13 +227,13 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_pipes.CfnPipe",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "constructs.Construct",
-                  "version": "10.2.69"
+                  "version": "10.3.0"
                 }
               },
               "public-rest-gateway": {
@@ -241,7 +241,7 @@
                 "path": "example-pets/pets/public-rest-gateway",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_apigateway.RestApiBase",
-                  "version": "2.90.0"
+                  "version": "2.110.0"
                 }
               },
               "public-rest-gateway-root-resource": {
@@ -265,7 +265,7 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "PUT": {
@@ -337,25 +337,25 @@
                             },
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
-                              "version": "2.90.0"
+                              "version": "2.110.0"
                             }
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_apigateway.Method",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_apigateway.Resource",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_apigateway.ResourceBase",
-                  "version": "2.90.0"
+                  "version": "2.110.0"
                 }
               },
               "event-store-integration": {
@@ -397,13 +397,13 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.Policy",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "putEventRole": {
@@ -415,7 +415,7 @@
                         "path": "example-pets/pets/event-store-integration/putEventRole/ImportputEventRole",
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.Resource",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "Resource": {
@@ -440,13 +440,13 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.Role",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "public-rest-gateway-deployment": {
@@ -459,26 +459,26 @@
                         "attributes": {
                           "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
                           "aws:cdk:cloudformation:props": {
-                            "description": "Fri Sep 15 2023",
+                            "description": "Sun Nov 19 2023",
                             "restApiId": "9wejt4xyxa",
                             "stageName": "prod"
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_apigateway.CfnDeployment",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_apigateway.Deployment",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "constructs.Construct",
-                  "version": "10.2.69"
+                  "version": "10.3.0"
                 }
               },
               "read-model": {
@@ -516,7 +516,7 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "ScalingRole": {
@@ -524,13 +524,13 @@
                         "path": "example-pets/pets/read-model/read-model-table/ScalingRole",
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.Resource",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_dynamodb.Table",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "event-listener": {
@@ -546,7 +546,7 @@
                             "path": "example-pets/pets/read-model/event-listener/ServiceRole/ImportServiceRole",
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.Resource",
-                              "version": "2.90.0"
+                              "version": "2.110.0"
                             }
                           },
                           "Resource": {
@@ -585,13 +585,13 @@
                             },
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                              "version": "2.90.0"
+                              "version": "2.110.0"
                             }
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_iam.Role",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "Code": {
@@ -603,7 +603,7 @@
                             "path": "example-pets/pets/read-model/event-listener/Code/Stage",
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.AssetStaging",
-                              "version": "2.90.0"
+                              "version": "2.110.0"
                             }
                           },
                           "AssetBucket": {
@@ -611,13 +611,13 @@
                             "path": "example-pets/pets/read-model/event-listener/Code/AssetBucket",
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                              "version": "2.90.0"
+                              "version": "2.110.0"
                             }
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "Resource": {
@@ -628,7 +628,7 @@
                           "aws:cdk:cloudformation:props": {
                             "code": {
                               "s3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
-                              "s3Key": "59c3d25538a2f9b6d4bbe2e5920f31c4c09ae95a5186ddf5603281f17d06d365.zip"
+                              "s3Key": "4ea5e6b625bf22d9a1a63f1ddd25f936b66fc0838a0e5dd1cb87346e596c00fa.zip"
                             },
                             "environment": {
                               "variables": {
@@ -643,18 +643,18 @@
                                 "Arn"
                               ]
                             },
-                            "runtime": "nodejs18.x"
+                            "runtime": "nodejs16.x"
                           }
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_lambda_nodejs.NodejsFunction",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   },
                   "rule": {
@@ -691,7 +691,7 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_events.CfnRule",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       },
                       "AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E": {
@@ -718,25 +718,25 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                          "version": "2.90.0"
+                          "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_events.Rule",
-                      "version": "2.90.0"
+                      "version": "2.110.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "constructs.Construct",
-                  "version": "10.2.69"
+                  "version": "10.3.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "constructs.Construct",
-              "version": "10.2.69"
+              "version": "10.3.0"
             }
           },
           "CDKMetadata": {
@@ -748,13 +748,13 @@
                 "path": "example-pets/CDKMetadata/Default",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
-                  "version": "2.90.0"
+                  "version": "2.110.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "constructs.Construct",
-              "version": "10.2.69"
+              "version": "10.3.0"
             }
           },
           "BootstrapVersion": {
@@ -762,7 +762,7 @@
             "path": "example-pets/BootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnParameter",
-              "version": "2.90.0"
+              "version": "2.110.0"
             }
           },
           "CheckBootstrapVersion": {
@@ -770,13 +770,13 @@
             "path": "example-pets/CheckBootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnRule",
-              "version": "2.90.0"
+              "version": "2.110.0"
             }
           }
         },
         "constructInfo": {
           "fqn": "aws-cdk-lib.Stack",
-          "version": "2.90.0"
+          "version": "2.110.0"
         }
       },
       "Tree": {
@@ -784,13 +784,13 @@
         "path": "Tree",
         "constructInfo": {
           "fqn": "constructs.Construct",
-          "version": "10.2.69"
+          "version": "10.3.0"
         }
       }
     },
     "constructInfo": {
       "fqn": "aws-cdk-lib.App",
-      "version": "2.90.0"
+      "version": "2.110.0"
     }
   }
 }

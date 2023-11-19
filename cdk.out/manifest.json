@@ -1,5 +1,5 @@
 {
-  "version": "33.0.0",
+  "version": "35.0.0",
   "artifacts": {
     "example-pets.assets": {
       "type": "cdk:asset-manifest",
@@ -14,10 +14,11 @@
       "environment": "aws://588476158895/eu-central-1",
       "properties": {
         "templateFile": "example-pets.template.json",
+        "terminationProtection": false,
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-deploy-role-588476158895-eu-central-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-cfn-exec-role-588476158895-eu-central-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/9e8840b3958bd6ecfb618e70cde96500af5a6989a85550420941289378815441.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/cfa430a52ead7c10e8442e297e0df79ff2cdca61faaba7129c82ca44446a3e76.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -84,7 +85,7 @@
         "/example-pets/pets/event-store-integration/public-rest-gateway-deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "petseventstoreintegrationpublicrestgatewaydeployment83D842F5b9ed01e525f499811e256bed44b754cc"
+            "data": "petseventstoreintegrationpublicrestgatewaydeployment83D842F52851712096b64d66856b4bc8a3edba15"
           }
         ],
         "/example-pets/pets/read-model/read-model-table": [

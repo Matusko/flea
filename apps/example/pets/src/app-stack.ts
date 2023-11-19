@@ -8,7 +8,7 @@ export class AppStack extends Stack {
     super(scope, id, props);
 
     new FleaDomain(this, 'pets', {
-      name: 'pets',
+      name: 'pets2',
       restApiId: '9wejt4xyxa',
       rootResourceId: 'zu9qs4uwok',
       domainResourcePath: 'pets',

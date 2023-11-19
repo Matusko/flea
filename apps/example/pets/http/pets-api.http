@@ -1,0 +1,9 @@
+PUT https://9wejt4xyxa.execute-api.eu-central-1.amazonaws.com/prod/pets
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "name": "111",
+  "color": "222"
+}
