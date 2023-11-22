@@ -6,6 +6,9 @@ export interface FleaRESTGatewayProps {
 }
 
 export class FleaRESTGateway extends Construct {
+  public restApiId: string;
+  public rootResourceId: string;
+
   constructor(scope: Construct, id: string, props: FleaRESTGatewayProps) {
     super(scope, id);
 
@@ -30,5 +33,8 @@ export class FleaRESTGateway extends Construct {
         { statusCode: '200' },
       ],
     });
+     this.restApiId = api.restApiId;
+     this.rootResourceId = api.root.resourceId;
+
   }
 }

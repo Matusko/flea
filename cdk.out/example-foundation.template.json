@@ -170,10 +170,16 @@
     "AdminCreateUserConfig": {
      "AllowAdminCreateUserOnly": true
     },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
     "EmailVerificationMessage": "The verification code to your new account is {####}",
     "EmailVerificationSubject": "Verify your new account",
     "SmsVerificationMessage": "The verification code to your new account is {####}",
     "UserPoolName": "flea-example",
+    "UsernameAttributes": [
+     "email"
+    ],
     "VerificationMessageTemplate": {
      "DefaultEmailOption": "CONFIRM_WITH_CODE",
      "EmailMessage": "The verification code to your new account is {####}",
@@ -195,13 +201,16 @@
     ],
     "AllowedOAuthFlowsUserPoolClient": true,
     "AllowedOAuthScopes": [
-     "openid"
+     "openid",
+     "profile",
+     "email",
+     "aws.cognito.signin.user.admin"
     ],
     "CallbackURLs": [
-     "https://my-app-domain.com/welcome"
+     "http://localhost:4200"
     ],
     "LogoutURLs": [
-     "https://my-app-domain.com/signin"
+     "http://localhost:4200/login"
     ],
     "SupportedIdentityProviders": [
      "COGNITO"
@@ -512,6 +521,33 @@
       "/"
      ]
     ]
+   }
+  },
+  "exampleoutputsoutputrestApiId1C1BFC7A": {
+   "Value": {
+    "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
+   },
+   "Export": {
+    "Name": "flea-example-restApiId"
+   }
+  },
+  "exampleoutputsoutputrootResourceId75A6AEEC": {
+   "Value": {
+    "Fn::GetAtt": [
+     "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5",
+     "RootResourceId"
+    ]
+   },
+   "Export": {
+    "Name": "flea-example-rootResourceId"
+   }
+  },
+  "exampleoutputsoutputwebSocketApiIdF6EBE3B3": {
+   "Value": {
+    "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
+   },
+   "Export": {
+    "Name": "flea-example-webSocketApiId"
    }
   }
  },

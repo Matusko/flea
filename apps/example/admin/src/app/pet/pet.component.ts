@@ -12,7 +12,7 @@ export class PetComponent {
 
    // const socket$ = makeWebSocketObservable('wss://876ro4w8qd.execute-api.eu-central-1.amazonaws.com/prod/');
 
-    const subject = webSocket('wss://876ro4w8qd.execute-api.eu-central-1.amazonaws.com/prod/');
+    const subject = webSocket('wss://edaxipnzr1.execute-api.eu-central-1.amazonaws.com/prod/');
 
     subject.subscribe({
       next: msg => console.log('message received: ' + JSON.stringify(msg)), // Called whenever there is a message from the server.

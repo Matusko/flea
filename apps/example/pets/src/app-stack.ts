@@ -8,9 +8,8 @@ export class AppStack extends Stack {
     super(scope, id, props);
 
     new FleaDomain(this, 'pets', {
-      name: 'pets2',
-      restApiId: '9wejt4xyxa',
-      rootResourceId: 'zu9qs4uwok',
+      name: 'pets',
+      foundationName: 'flea-example',
       domainResourcePath: 'pets',
       readModelTableName: 'pets',
       eventListenerProps: {
@@ -20,8 +19,7 @@ export class AppStack extends Stack {
       readModelPublicBusIntegrationProps: {
         region: props.env.region,
         account: props.env.account,
-        stage: 'prod',
-        webSocketApiId: '876ro4w8qd'
+        stage: 'prod'
       }
     });
 

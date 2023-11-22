@@ -5,11 +5,14 @@ import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
 import {IEventBus, Rule} from 'aws-cdk-lib/aws-events';
 import {Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 
-export interface ReadModelPublicBusIntegrationProps {
-  webSocketApiId: string;
+export interface ReadModelPublicBusIntegrationBaseProps {
   stage: string;
   account: string;
   region: string;
+}
+
+export interface ReadModelPublicBusIntegrationProps extends ReadModelPublicBusIntegrationBaseProps {
+  webSocketApiId: string;
 }
 
 export interface FleaReadModelProps {

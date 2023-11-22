@@ -4,43 +4,554 @@
     "id": "App",
     "path": "",
     "children": {
-      "example-foundation": {
-        "id": "example-foundation",
-        "path": "example-foundation",
+      "example-pets": {
+        "id": "example-pets",
+        "path": "example-pets",
         "children": {
-          "example": {
-            "id": "example",
-            "path": "example-foundation/example",
+          "pets": {
+            "id": "pets",
+            "path": "example-pets/pets",
             "children": {
-              "public-gateway": {
-                "id": "public-gateway",
-                "path": "example-foundation/example/public-gateway",
+              "event-store": {
+                "id": "event-store",
+                "path": "example-pets/pets/event-store",
                 "children": {
-                  "public-gateway-public-rest-gateway": {
-                    "id": "public-gateway-public-rest-gateway",
-                    "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway",
+                  "event-store": {
+                    "id": "event-store",
+                    "path": "example-pets/pets/event-store/event-store",
                     "children": {
                       "Resource": {
                         "id": "Resource",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Resource",
+                        "path": "example-pets/pets/event-store/event-store/Resource",
                         "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::RestApi",
+                          "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
                           "aws:cdk:cloudformation:props": {
-                            "name": "flea-example"
+                            "attributeDefinitions": [
+                              {
+                                "attributeName": "id",
+                                "attributeType": "S"
+                              }
+                            ],
+                            "keySchema": [
+                              {
+                                "attributeName": "id",
+                                "keyType": "HASH"
+                              }
+                            ],
+                            "provisionedThroughput": {
+                              "readCapacityUnits": 5,
+                              "writeCapacityUnits": 5
+                            },
+                            "streamSpecification": {
+                              "streamViewType": "NEW_IMAGE"
+                            }
                           }
                         },
                         "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.CfnRestApi",
+                          "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
                           "version": "2.110.0"
                         }
                       },
-                      "CloudWatchRole": {
-                        "id": "CloudWatchRole",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/CloudWatchRole",
+                      "ScalingRole": {
+                        "id": "ScalingRole",
+                        "path": "example-pets/pets/event-store/event-store/ScalingRole",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.Resource",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+                      "version": "2.110.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.3.0"
+                }
+              },
+              "domain-event-bus": {
+                "id": "domain-event-bus",
+                "path": "example-pets/pets/domain-event-bus",
+                "children": {
+                  "event-bus": {
+                    "id": "event-bus",
+                    "path": "example-pets/pets/domain-event-bus/event-bus",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/domain-event-bus/event-bus/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::Events::EventBus",
+                          "aws:cdk:cloudformation:props": {
+                            "name": "pets"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_events.CfnEventBus",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_events.EventBus",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "PipeRole": {
+                    "id": "PipeRole",
+                    "path": "example-pets/pets/domain-event-bus/PipeRole",
+                    "children": {
+                      "ImportPipeRole": {
+                        "id": "ImportPipeRole",
+                        "path": "example-pets/pets/domain-event-bus/PipeRole/ImportPipeRole",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.Resource",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/domain-event-bus/PipeRole/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                          "aws:cdk:cloudformation:props": {
+                            "assumeRolePolicyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Principal": {
+                                    "Service": "pipes.amazonaws.com"
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policies": [
+                              {
+                                "policyName": "sourcePolicy",
+                                "policyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": [
+                                        "dynamodb:DescribeStream",
+                                        "dynamodb:GetRecords",
+                                        "dynamodb:GetShardIterator",
+                                        "dynamodb:ListStreams"
+                                      ],
+                                      "Effect": "Allow",
+                                      "Resource": {
+                                        "Fn::GetAtt": [
+                                          "petseventstore81DA8DE9",
+                                          "StreamArn"
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                }
+                              },
+                              {
+                                "policyName": "targetPolicy",
+                                "policyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "events:PutEvents",
+                                      "Effect": "Allow",
+                                      "Resource": {
+                                        "Fn::GetAtt": [
+                                          "petsdomaineventbus4C3E1981",
+                                          "Arn"
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Role",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "pipe": {
+                    "id": "pipe",
+                    "path": "example-pets/pets/domain-event-bus/pipe",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Pipes::Pipe",
+                      "aws:cdk:cloudformation:props": {
+                        "name": "SampleTableModifyPipe",
+                        "roleArn": {
+                          "Fn::GetAtt": [
+                            "petsdomaineventbusPipeRole6F932D1F",
+                            "Arn"
+                          ]
+                        },
+                        "source": {
+                          "Fn::GetAtt": [
+                            "petseventstore81DA8DE9",
+                            "StreamArn"
+                          ]
+                        },
+                        "sourceParameters": {
+                          "dynamoDbStreamParameters": {
+                            "startingPosition": "LATEST",
+                            "batchSize": 1
+                          }
+                        },
+                        "target": {
+                          "Fn::GetAtt": [
+                            "petsdomaineventbus4C3E1981",
+                            "Arn"
+                          ]
+                        },
+                        "targetParameters": {
+                          "eventBridgeEventBusParameters": {
+                            "detailType": "SampleTableModified",
+                            "source": "com.sample"
+                          }
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_pipes.CfnPipe",
+                      "version": "2.110.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.3.0"
+                }
+              },
+              "public-rest-gateway": {
+                "id": "public-rest-gateway",
+                "path": "example-pets/pets/public-rest-gateway",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.RestApiBase",
+                  "version": "2.110.0"
+                }
+              },
+              "public-rest-gateway-root-resource": {
+                "id": "public-rest-gateway-root-resource",
+                "path": "example-pets/pets/public-rest-gateway-root-resource",
+                "children": {
+                  "pets": {
+                    "id": "pets",
+                    "path": "example-pets/pets/public-rest-gateway-root-resource/pets",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/public-rest-gateway-root-resource/pets/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                          "aws:cdk:cloudformation:props": {
+                            "parentId": {
+                              "Fn::ImportValue": "flea-example-rootResourceId"
+                            },
+                            "pathPart": "pets",
+                            "restApiId": {
+                              "Fn::ImportValue": "flea-example-restApiId"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "PUT": {
+                        "id": "PUT",
+                        "path": "example-pets/pets/public-rest-gateway-root-resource/pets/PUT",
                         "children": {
-                          "ImportCloudWatchRole": {
-                            "id": "ImportCloudWatchRole",
-                            "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/CloudWatchRole/ImportCloudWatchRole",
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "example-pets/pets/public-rest-gateway-root-resource/pets/PUT/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "authorizationType": "NONE",
+                                "httpMethod": "PUT",
+                                "integration": {
+                                  "type": "AWS",
+                                  "uri": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:",
+                                        {
+                                          "Ref": "AWS::Partition"
+                                        },
+                                        ":apigateway:eu-central-1:dynamodb:action/PutItem"
+                                      ]
+                                    ]
+                                  },
+                                  "integrationHttpMethod": "POST",
+                                  "requestTemplates": {
+                                    "application/json": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "{\n              \"Item\": {\n                \"id\": {\n                  \"S\": \"$context.requestId\"\n                },\n                \"Name\": {\n                  \"S\": \"$input.path('$.name')\"\n                },\n                \"Color\": {\n                  \"S\": \"$input.path('$.color')\"\n                }\n              },\n              \"TableName\": \"",
+                                          {
+                                            "Ref": "petseventstore81DA8DE9"
+                                          },
+                                          "\"\n            }"
+                                        ]
+                                      ]
+                                    }
+                                  },
+                                  "integrationResponses": [
+                                    {
+                                      "statusCode": "202",
+                                      "responseTemplates": {
+                                        "application/json": "{\n                \"requestId\": \"$context.requestId\"\n              }"
+                                      }
+                                    }
+                                  ],
+                                  "credentials": {
+                                    "Fn::GetAtt": [
+                                      "petseventstoreintegrationputEventRoleB3FE91FB",
+                                      "Arn"
+                                    ]
+                                  }
+                                },
+                                "methodResponses": [
+                                  {
+                                    "statusCode": "202"
+                                  }
+                                ],
+                                "resourceId": {
+                                  "Ref": "petspublicrestgatewayrootresourcepets31A0AEB9"
+                                },
+                                "restApiId": {
+                                  "Fn::ImportValue": "flea-example-restApiId"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                              "version": "2.110.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.Resource",
+                      "version": "2.110.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.ResourceBase",
+                  "version": "2.110.0"
+                }
+              },
+              "event-store-integration": {
+                "id": "event-store-integration",
+                "path": "example-pets/pets/event-store-integration",
+                "children": {
+                  "putEventPolicy": {
+                    "id": "putEventPolicy",
+                    "path": "example-pets/pets/event-store-integration/putEventPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/event-store-integration/putEventPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "dynamodb:PutItem",
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::GetAtt": [
+                                      "petseventstore81DA8DE9",
+                                      "Arn"
+                                    ]
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "petseventstoreintegrationputEventPolicy1B4823B4",
+                            "roles": [
+                              {
+                                "Ref": "petseventstoreintegrationputEventRoleB3FE91FB"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "putEventRole": {
+                    "id": "putEventRole",
+                    "path": "example-pets/pets/event-store-integration/putEventRole",
+                    "children": {
+                      "ImportputEventRole": {
+                        "id": "ImportputEventRole",
+                        "path": "example-pets/pets/event-store-integration/putEventRole/ImportputEventRole",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.Resource",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/event-store-integration/putEventRole/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                          "aws:cdk:cloudformation:props": {
+                            "assumeRolePolicyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Principal": {
+                                    "Service": "apigateway.amazonaws.com"
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Role",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "public-rest-gateway-deployment": {
+                    "id": "public-rest-gateway-deployment",
+                    "path": "example-pets/pets/event-store-integration/public-rest-gateway-deployment",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/event-store-integration/public-rest-gateway-deployment/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
+                          "aws:cdk:cloudformation:props": {
+                            "description": "Wed Nov 22 2023",
+                            "restApiId": {
+                              "Fn::ImportValue": "flea-example-restApiId"
+                            },
+                            "stageName": "prod"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnDeployment",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.Deployment",
+                      "version": "2.110.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.3.0"
+                }
+              },
+              "read-model": {
+                "id": "read-model",
+                "path": "example-pets/pets/read-model",
+                "children": {
+                  "read-model-table": {
+                    "id": "read-model-table",
+                    "path": "example-pets/pets/read-model/read-model-table",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/read-model/read-model-table/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                          "aws:cdk:cloudformation:props": {
+                            "attributeDefinitions": [
+                              {
+                                "attributeName": "id",
+                                "attributeType": "S"
+                              }
+                            ],
+                            "keySchema": [
+                              {
+                                "attributeName": "id",
+                                "keyType": "HASH"
+                              }
+                            ],
+                            "provisionedThroughput": {
+                              "readCapacityUnits": 5,
+                              "writeCapacityUnits": 5
+                            },
+                            "tableName": "pets"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "ScalingRole": {
+                        "id": "ScalingRole",
+                        "path": "example-pets/pets/read-model/read-model-table/ScalingRole",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.Resource",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "event-listener": {
+                    "id": "event-listener",
+                    "path": "example-pets/pets/read-model/event-listener",
+                    "children": {
+                      "ServiceRole": {
+                        "id": "ServiceRole",
+                        "path": "example-pets/pets/read-model/event-listener/ServiceRole",
+                        "children": {
+                          "ImportServiceRole": {
+                            "id": "ImportServiceRole",
+                            "path": "example-pets/pets/read-model/event-listener/ServiceRole/ImportServiceRole",
                             "constructInfo": {
                               "fqn": "aws-cdk-lib.Resource",
                               "version": "2.110.0"
@@ -48,7 +559,7 @@
                           },
                           "Resource": {
                             "id": "Resource",
-                            "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/CloudWatchRole/Resource",
+                            "path": "example-pets/pets/read-model/event-listener/ServiceRole/Resource",
                             "attributes": {
                               "aws:cdk:cloudformation:type": "AWS::IAM::Role",
                               "aws:cdk:cloudformation:props": {
@@ -58,7 +569,7 @@
                                       "Action": "sts:AssumeRole",
                                       "Effect": "Allow",
                                       "Principal": {
-                                        "Service": "apigateway.amazonaws.com"
+                                        "Service": "lambda.amazonaws.com"
                                       }
                                     }
                                   ],
@@ -73,7 +584,7 @@
                                         {
                                           "Ref": "AWS::Partition"
                                         },
-                                        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+                                        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
                                       ]
                                     ]
                                   }
@@ -84,6 +595,56 @@
                               "fqn": "aws-cdk-lib.aws_iam.CfnRole",
                               "version": "2.110.0"
                             }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "example-pets/pets/read-model/event-listener/ServiceRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "example-pets/pets/read-model/event-listener/ServiceRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": "execute-api:ManageConnections",
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::Join": [
+                                              "",
+                                              [
+                                                "arn:aws:execute-api:eu-central-1:588476158895:",
+                                                {
+                                                  "Fn::ImportValue": "flea-example-webSocketApiId"
+                                                },
+                                                "/prod/POST/@connections/*"
+                                              ]
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "petsreadmodeleventlistenerServiceRoleDefaultPolicyFAD3089B",
+                                    "roles": [
+                                      {
+                                        "Ref": "petsreadmodeleventlistenerServiceRole6AEE490E"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.110.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.110.0"
+                            }
                           }
                         },
                         "constructInfo": {
@@ -91,749 +652,137 @@
                           "version": "2.110.0"
                         }
                       },
-                      "Account": {
-                        "id": "Account",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Account",
+                      "Code": {
+                        "id": "Code",
+                        "path": "example-pets/pets/read-model/event-listener/Code",
+                        "children": {
+                          "Stage": {
+                            "id": "Stage",
+                            "path": "example-pets/pets/read-model/event-listener/Code/Stage",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.AssetStaging",
+                              "version": "2.110.0"
+                            }
+                          },
+                          "AssetBucket": {
+                            "id": "AssetBucket",
+                            "path": "example-pets/pets/read-model/event-listener/Code/AssetBucket",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                              "version": "2.110.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/read-model/event-listener/Resource",
                         "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Account",
+                          "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
                           "aws:cdk:cloudformation:props": {
-                            "cloudWatchRoleArn": {
+                            "code": {
+                              "s3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+                              "s3Key": "a5054baff004b0ec3c488492e1442229b3836bd9eb0f5b1802b96c8b075fb632.zip"
+                            },
+                            "environment": {
+                              "variables": {
+                                "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+                              }
+                            },
+                            "functionName": "pets-event-handler",
+                            "handler": "index.handler",
+                            "role": {
                               "Fn::GetAtt": [
-                                "examplepublicgatewaypublicgatewaypublicrestgatewayCloudWatchRole49FB2841",
+                                "petsreadmodeleventlistenerServiceRole6AEE490E",
+                                "Arn"
+                              ]
+                            },
+                            "runtime": "nodejs16.x"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda_nodejs.NodejsFunction",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "rule": {
+                    "id": "rule",
+                    "path": "example-pets/pets/read-model/rule",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/read-model/rule/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::Events::Rule",
+                          "aws:cdk:cloudformation:props": {
+                            "eventBusName": {
+                              "Ref": "petsdomaineventbus4C3E1981"
+                            },
+                            "eventPattern": {
+                              "source": [
+                                "com.sample"
+                              ]
+                            },
+                            "state": "ENABLED",
+                            "targets": [
+                              {
+                                "id": "Target0",
+                                "arn": {
+                                  "Fn::GetAtt": [
+                                    "petsreadmodeleventlistenerAAF55874",
+                                    "Arn"
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_events.CfnRule",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E": {
+                        "id": "AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E",
+                        "path": "example-pets/pets/read-model/rule/AllowEventRuleexamplepetsreadmodeleventlistenerC3A7E36E",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                          "aws:cdk:cloudformation:props": {
+                            "action": "lambda:InvokeFunction",
+                            "functionName": {
+                              "Fn::GetAtt": [
+                                "petsreadmodeleventlistenerAAF55874",
+                                "Arn"
+                              ]
+                            },
+                            "principal": "events.amazonaws.com",
+                            "sourceArn": {
+                              "Fn::GetAtt": [
+                                "petsreadmodelrule244915A4",
                                 "Arn"
                               ]
                             }
                           }
                         },
                         "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.CfnAccount",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "Deployment": {
-                        "id": "Deployment",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Deployment",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Deployment/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
-                              "aws:cdk:cloudformation:props": {
-                                "description": "Automatically created by the RestApi construct",
-                                "restApiId": {
-                                  "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigateway.CfnDeployment",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.Deployment",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "DeploymentStage.prod": {
-                        "id": "DeploymentStage.prod",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/DeploymentStage.prod",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/DeploymentStage.prod/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
-                              "aws:cdk:cloudformation:props": {
-                                "deploymentId": {
-                                  "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD98785a803edebe6cc05c7443bb208f285"
-                                },
-                                "restApiId": {
-                                  "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
-                                },
-                                "stageName": "prod"
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigateway.CfnStage",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.Stage",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "Endpoint": {
-                        "id": "Endpoint",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Endpoint",
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.CfnOutput",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "Default": {
-                        "id": "Default",
-                        "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default",
-                        "children": {
-                          "health": {
-                            "id": "health",
-                            "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health",
-                            "children": {
-                              "Resource": {
-                                "id": "Resource",
-                                "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/Resource",
-                                "attributes": {
-                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
-                                  "aws:cdk:cloudformation:props": {
-                                    "parentId": {
-                                      "Fn::GetAtt": [
-                                        "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5",
-                                        "RootResourceId"
-                                      ]
-                                    },
-                                    "pathPart": "health",
-                                    "restApiId": {
-                                      "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
-                                    }
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
-                                  "version": "2.110.0"
-                                }
-                              },
-                              "GET": {
-                                "id": "GET",
-                                "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET",
-                                "children": {
-                                  "Resource": {
-                                    "id": "Resource",
-                                    "path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET/Resource",
-                                    "attributes": {
-                                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
-                                      "aws:cdk:cloudformation:props": {
-                                        "authorizationType": "NONE",
-                                        "httpMethod": "GET",
-                                        "integration": {
-                                          "type": "MOCK",
-                                          "requestTemplates": {
-                                            "application/json": "{ \"statusCode\": 200 }"
-                                          },
-                                          "passthroughBehavior": "NEVER",
-                                          "integrationResponses": [
-                                            {
-                                              "statusCode": "200",
-                                              "responseTemplates": {
-                                                "application/json": "{\"status\": \"OK\"}"
-                                              }
-                                            }
-                                          ]
-                                        },
-                                        "methodResponses": [
-                                          {
-                                            "statusCode": "200"
-                                          }
-                                        ],
-                                        "resourceId": {
-                                          "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayhealth5A4EB55A"
-                                        },
-                                        "restApiId": {
-                                          "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
-                                        }
-                                      }
-                                    },
-                                    "constructInfo": {
-                                      "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
-                                      "version": "2.110.0"
-                                    }
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_apigateway.Method",
-                                  "version": "2.110.0"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigateway.Resource",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.ResourceBase",
+                          "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
                           "version": "2.110.0"
                         }
                       }
                     },
                     "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_apigateway.RestApi",
+                      "fqn": "aws-cdk-lib.aws_events.Rule",
                       "version": "2.110.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "constructs.Construct",
-                  "version": "10.3.0"
-                }
-              },
-              "identty-provider": {
-                "id": "identty-provider",
-                "path": "example-foundation/example/identty-provider",
-                "children": {
-                  "user-pool": {
-                    "id": "user-pool",
-                    "path": "example-foundation/example/identty-provider/user-pool",
-                    "children": {
-                      "Resource": {
-                        "id": "Resource",
-                        "path": "example-foundation/example/identty-provider/user-pool/Resource",
-                        "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::Cognito::UserPool",
-                          "aws:cdk:cloudformation:props": {
-                            "accountRecoverySetting": {
-                              "recoveryMechanisms": [
-                                {
-                                  "name": "verified_phone_number",
-                                  "priority": 1
-                                },
-                                {
-                                  "name": "verified_email",
-                                  "priority": 2
-                                }
-                              ]
-                            },
-                            "adminCreateUserConfig": {
-                              "allowAdminCreateUserOnly": true
-                            },
-                            "emailVerificationMessage": "The verification code to your new account is {####}",
-                            "emailVerificationSubject": "Verify your new account",
-                            "smsVerificationMessage": "The verification code to your new account is {####}",
-                            "userPoolName": "flea-example",
-                            "verificationMessageTemplate": {
-                              "defaultEmailOption": "CONFIRM_WITH_CODE",
-                              "emailMessage": "The verification code to your new account is {####}",
-                              "emailSubject": "Verify your new account",
-                              "smsMessage": "The verification code to your new account is {####}"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_cognito.CfnUserPool",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "user-pool-client-admin": {
-                        "id": "user-pool-client-admin",
-                        "path": "example-foundation/example/identty-provider/user-pool/user-pool-client-admin",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/identty-provider/user-pool/user-pool-client-admin/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::Cognito::UserPoolClient",
-                              "aws:cdk:cloudformation:props": {
-                                "allowedOAuthFlows": [
-                                  "code"
-                                ],
-                                "allowedOAuthFlowsUserPoolClient": true,
-                                "allowedOAuthScopes": [
-                                  "openid"
-                                ],
-                                "callbackUrLs": [
-                                  "https://my-app-domain.com/welcome"
-                                ],
-                                "logoutUrLs": [
-                                  "https://my-app-domain.com/signin"
-                                ],
-                                "supportedIdentityProviders": [
-                                  "COGNITO"
-                                ],
-                                "userPoolId": {
-                                  "Ref": "exampleidenttyprovideruserpool073DDCBA"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_cognito.CfnUserPoolClient",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_cognito.UserPoolClient",
-                          "version": "2.110.0"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_cognito.UserPool",
-                      "version": "2.110.0"
-                    }
-                  },
-                  "user-pool-domain": {
-                    "id": "user-pool-domain",
-                    "path": "example-foundation/example/identty-provider/user-pool-domain",
-                    "children": {
-                      "Resource": {
-                        "id": "Resource",
-                        "path": "example-foundation/example/identty-provider/user-pool-domain/Resource",
-                        "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::Cognito::UserPoolDomain",
-                          "aws:cdk:cloudformation:props": {
-                            "domain": "flea-example",
-                            "userPoolId": {
-                              "Ref": "exampleidenttyprovideruserpool073DDCBA"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_cognito.CfnUserPoolDomain",
-                          "version": "2.110.0"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_cognito.UserPoolDomain",
-                      "version": "2.110.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "constructs.Construct",
-                  "version": "10.3.0"
-                }
-              },
-              "admin": {
-                "id": "admin",
-                "path": "example-foundation/example/admin",
-                "constructInfo": {
-                  "fqn": "constructs.Construct",
-                  "version": "10.3.0"
-                }
-              },
-              "admin-admin-bucket": {
-                "id": "admin-admin-bucket",
-                "path": "example-foundation/example/admin-admin-bucket",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "example-foundation/example/admin-admin-bucket/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
-                      "aws:cdk:cloudformation:props": {
-                        "bucketEncryption": {
-                          "serverSideEncryptionConfiguration": [
-                            {
-                              "serverSideEncryptionByDefault": {
-                                "sseAlgorithm": "AES256"
-                              }
-                            }
-                          ]
-                        },
-                        "publicAccessBlockConfiguration": {
-                          "blockPublicAcls": true,
-                          "blockPublicPolicy": true,
-                          "ignorePublicAcls": true,
-                          "restrictPublicBuckets": true
-                        },
-                        "versioningConfiguration": {
-                          "status": "Enabled"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
-                      "version": "2.110.0"
-                    }
-                  },
-                  "Policy": {
-                    "id": "Policy",
-                    "path": "example-foundation/example/admin-admin-bucket/Policy",
-                    "children": {
-                      "Resource": {
-                        "id": "Resource",
-                        "path": "example-foundation/example/admin-admin-bucket/Policy/Resource",
-                        "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
-                          "aws:cdk:cloudformation:props": {
-                            "bucket": {
-                              "Ref": "exampleadminadminbucketD411474B"
-                            },
-                            "policyDocument": {
-                              "Statement": [
-                                {
-                                  "Action": "s3:*",
-                                  "Condition": {
-                                    "Bool": {
-                                      "aws:SecureTransport": "false"
-                                    }
-                                  },
-                                  "Effect": "Deny",
-                                  "Principal": {
-                                    "AWS": "*"
-                                  },
-                                  "Resource": [
-                                    {
-                                      "Fn::GetAtt": [
-                                        "exampleadminadminbucketD411474B",
-                                        "Arn"
-                                      ]
-                                    },
-                                    {
-                                      "Fn::Join": [
-                                        "",
-                                        [
-                                          {
-                                            "Fn::GetAtt": [
-                                              "exampleadminadminbucketD411474B",
-                                              "Arn"
-                                            ]
-                                          },
-                                          "/*"
-                                        ]
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ],
-                              "Version": "2012-10-17"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
-                          "version": "2.110.0"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
-                      "version": "2.110.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_s3.Bucket",
-                  "version": "2.110.0"
-                }
-              },
-              "public-bus": {
-                "id": "public-bus",
-                "path": "example-foundation/example/public-bus",
-                "children": {
-                  "ws-gateway": {
-                    "id": "ws-gateway",
-                    "path": "example-foundation/example/public-bus/ws-gateway",
-                    "children": {
-                      "connect-handler": {
-                        "id": "connect-handler",
-                        "path": "example-foundation/example/public-bus/ws-gateway/connect-handler",
-                        "children": {
-                          "ServiceRole": {
-                            "id": "ServiceRole",
-                            "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/ServiceRole",
-                            "children": {
-                              "ImportServiceRole": {
-                                "id": "ImportServiceRole",
-                                "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/ServiceRole/ImportServiceRole",
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.Resource",
-                                  "version": "2.110.0"
-                                }
-                              },
-                              "Resource": {
-                                "id": "Resource",
-                                "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/ServiceRole/Resource",
-                                "attributes": {
-                                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
-                                  "aws:cdk:cloudformation:props": {
-                                    "assumeRolePolicyDocument": {
-                                      "Statement": [
-                                        {
-                                          "Action": "sts:AssumeRole",
-                                          "Effect": "Allow",
-                                          "Principal": {
-                                            "Service": "lambda.amazonaws.com"
-                                          }
-                                        }
-                                      ],
-                                      "Version": "2012-10-17"
-                                    },
-                                    "managedPolicyArns": [
-                                      {
-                                        "Fn::Join": [
-                                          "",
-                                          [
-                                            "arn:",
-                                            {
-                                              "Ref": "AWS::Partition"
-                                            },
-                                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-                                          ]
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                                  "version": "2.110.0"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_iam.Role",
-                              "version": "2.110.0"
-                            }
-                          },
-                          "Code": {
-                            "id": "Code",
-                            "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/Code",
-                            "children": {
-                              "Stage": {
-                                "id": "Stage",
-                                "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/Code/Stage",
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.AssetStaging",
-                                  "version": "2.110.0"
-                                }
-                              },
-                              "AssetBucket": {
-                                "id": "AssetBucket",
-                                "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/Code/AssetBucket",
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                                  "version": "2.110.0"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                              "version": "2.110.0"
-                            }
-                          },
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/public-bus/ws-gateway/connect-handler/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
-                              "aws:cdk:cloudformation:props": {
-                                "code": {
-                                  "s3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
-                                  "s3Key": "192b490b4f31a84f662da801ecaafac9ef738bf52f2746712938ef2e323888c3.zip"
-                                },
-                                "environment": {
-                                  "variables": {
-                                    "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
-                                  }
-                                },
-                                "functionName": "public-bus-connect-handler",
-                                "handler": "index.handler",
-                                "role": {
-                                  "Fn::GetAtt": [
-                                    "examplepublicbuswsgatewayconnecthandlerServiceRole03B66F9D",
-                                    "Arn"
-                                  ]
-                                },
-                                "runtime": "nodejs16.x"
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_lambda_nodejs.NodejsFunction",
-                          "version": "2.110.0"
-                        }
-                      },
-                      "mywsapi": {
-                        "id": "mywsapi",
-                        "path": "example-foundation/example/public-bus/ws-gateway/mywsapi",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Api",
-                              "aws:cdk:cloudformation:props": {
-                                "name": "mywsapi",
-                                "protocolType": "WEBSOCKET",
-                                "routeSelectionExpression": "$request.body.action"
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnApi",
-                              "version": "2.110.0"
-                            }
-                          },
-                          "$connect-Route": {
-                            "id": "$connect-Route",
-                            "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route",
-                            "children": {
-                              "connetc-handler-integration-Permission": {
-                                "id": "connetc-handler-integration-Permission",
-                                "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/connetc-handler-integration-Permission",
-                                "attributes": {
-                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
-                                  "aws:cdk:cloudformation:props": {
-                                    "action": "lambda:InvokeFunction",
-                                    "functionName": {
-                                      "Fn::GetAtt": [
-                                        "examplepublicbuswsgatewayconnecthandler56032D0E",
-                                        "Arn"
-                                      ]
-                                    },
-                                    "principal": "apigateway.amazonaws.com",
-                                    "sourceArn": {
-                                      "Fn::Join": [
-                                        "",
-                                        [
-                                          "arn:",
-                                          {
-                                            "Ref": "AWS::Partition"
-                                          },
-                                          ":execute-api:eu-central-1:588476158895:",
-                                          {
-                                            "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
-                                          },
-                                          "/*$connect"
-                                        ]
-                                      ]
-                                    }
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                                  "version": "2.110.0"
-                                }
-                              },
-                              "connetc-handler-integration": {
-                                "id": "connetc-handler-integration",
-                                "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/connetc-handler-integration",
-                                "children": {
-                                  "Resource": {
-                                    "id": "Resource",
-                                    "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/connetc-handler-integration/Resource",
-                                    "attributes": {
-                                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
-                                      "aws:cdk:cloudformation:props": {
-                                        "apiId": {
-                                          "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
-                                        },
-                                        "integrationType": "AWS_PROXY",
-                                        "integrationUri": {
-                                          "Fn::Join": [
-                                            "",
-                                            [
-                                              "arn:",
-                                              {
-                                                "Ref": "AWS::Partition"
-                                              },
-                                              ":apigateway:eu-central-1:lambda:path/2015-03-31/functions/",
-                                              {
-                                                "Fn::GetAtt": [
-                                                  "examplepublicbuswsgatewayconnecthandler56032D0E",
-                                                  "Arn"
-                                                ]
-                                              },
-                                              "/invocations"
-                                            ]
-                                          ]
-                                        }
-                                      }
-                                    },
-                                    "constructInfo": {
-                                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
-                                      "version": "2.110.0"
-                                    }
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketIntegration",
-                                  "version": "2.110.0-alpha.0"
-                                }
-                              },
-                              "Resource": {
-                                "id": "Resource",
-                                "path": "example-foundation/example/public-bus/ws-gateway/mywsapi/$connect-Route/Resource",
-                                "attributes": {
-                                  "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
-                                  "aws:cdk:cloudformation:props": {
-                                    "apiId": {
-                                      "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
-                                    },
-                                    "authorizationType": "NONE",
-                                    "routeKey": "$connect",
-                                    "target": {
-                                      "Fn::Join": [
-                                        "",
-                                        [
-                                          "integrations/",
-                                          {
-                                            "Ref": "examplepublicbuswsgatewaymywsapiconnectRouteconnetchandlerintegrationB51C8F71"
-                                          }
-                                        ]
-                                      ]
-                                    }
-                                  }
-                                },
-                                "constructInfo": {
-                                  "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
-                                  "version": "2.110.0"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketRoute",
-                              "version": "2.110.0-alpha.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketApi",
-                          "version": "2.110.0-alpha.0"
-                        }
-                      },
-                      "mystage": {
-                        "id": "mystage",
-                        "path": "example-foundation/example/public-bus/ws-gateway/mystage",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "example-foundation/example/public-bus/ws-gateway/mystage/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Stage",
-                              "aws:cdk:cloudformation:props": {
-                                "apiId": {
-                                  "Ref": "examplepublicbuswsgatewaymywsapi0A506069"
-                                },
-                                "autoDeploy": true,
-                                "stageName": "prod"
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnStage",
-                              "version": "2.110.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "@aws-cdk/aws-apigatewayv2-alpha.WebSocketStage",
-                          "version": "2.110.0-alpha.0"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "constructs.Construct",
-                      "version": "10.3.0"
                     }
                   }
                 },
@@ -850,11 +799,11 @@
           },
           "CDKMetadata": {
             "id": "CDKMetadata",
-            "path": "example-foundation/CDKMetadata",
+            "path": "example-pets/CDKMetadata",
             "children": {
               "Default": {
                 "id": "Default",
-                "path": "example-foundation/CDKMetadata/Default",
+                "path": "example-pets/CDKMetadata/Default",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
                   "version": "2.110.0"
@@ -868,7 +817,7 @@
           },
           "BootstrapVersion": {
             "id": "BootstrapVersion",
-            "path": "example-foundation/BootstrapVersion",
+            "path": "example-pets/BootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnParameter",
               "version": "2.110.0"
@@ -876,7 +825,7 @@
           },
           "CheckBootstrapVersion": {
             "id": "CheckBootstrapVersion",
-            "path": "example-foundation/CheckBootstrapVersion",
+            "path": "example-pets/CheckBootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnRule",
               "version": "2.110.0"

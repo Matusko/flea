@@ -3,22 +3,30 @@ import {FleaEventStore} from './event-store.construct';
 import {FleaEventStorePublicGatewayIntegration} from './public-rest-gateway-integration.construct';
 import {Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {FleaEventBus} from './event-bus.construct';
-import {FleaReadModel, FleaReadModelProps, ReadModelPublicBusIntegrationProps} from './read-model.construct';
+import {
+  FleaReadModel,
+  ReadModelPublicBusIntegrationBaseProps,
+  ReadModelPublicBusIntegrationProps
+} from './read-model.construct';
 import {NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
+import {Fn} from 'aws-cdk-lib';
 
 export interface FleaDomainProps {
   name: string;
-  restApiId: string;
-  rootResourceId: string;
+  foundationName: string;
   domainResourcePath: string;
   readModelTableName: string;
   eventListenerProps: NodejsFunctionProps;
-  readModelPublicBusIntegrationProps: ReadModelPublicBusIntegrationProps;
+  readModelPublicBusIntegrationProps: ReadModelPublicBusIntegrationBaseProps;
 }
 
 export class FleaDomain extends Construct {
   constructor(scope: Construct, id: string, props: FleaDomainProps) {
     super(scope, id);
+
+    const restApiId = Fn.importValue(`${props.foundationName}-restApiId`);
+    const rootResourceId = Fn.importValue(`${props.foundationName}-rootResourceId`);
+    const webSocketApiId = Fn.importValue(`${props.foundationName}-webSocketApiId`);
 
     const eventStore = new FleaEventStore(this, 'event-store');
 
@@ -27,11 +35,11 @@ export class FleaDomain extends Construct {
       eventStore
     });
 
-    const api = RestApi.fromRestApiId(this, 'public-rest-gateway', props.restApiId);
+    const api = RestApi.fromRestApiId(this, 'public-rest-gateway', restApiId);
     const rootResource = Resource.fromResourceAttributes(this, 'public-rest-gateway-root-resource', {
       restApi: api,
       path: '',
-      resourceId: props.rootResourceId
+      resourceId: rootResourceId
     })
 
     new FleaEventStorePublicGatewayIntegration(this, 'event-store-integration', {
@@ -48,7 +56,10 @@ export class FleaDomain extends Construct {
       tableName: props.readModelTableName,
       eventListenerProps: props.eventListenerProps,
       eventBus: eventBus.bus,
-      publicBus: props.readModelPublicBusIntegrationProps,
+      publicBus: {
+        ...props.readModelPublicBusIntegrationProps,
+        webSocketApiId
+      },
     });
 
   }

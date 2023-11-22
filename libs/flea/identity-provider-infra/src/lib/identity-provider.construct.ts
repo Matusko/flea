@@ -10,16 +10,19 @@ export class FleaIdentityProvider extends Construct {
     super(scope, id);
 
     const pool = new UserPool(this, 'user-pool', {
-      userPoolName: props.name
+      userPoolName: props.name,
+      signInAliases: {
+        email: true
+      }
     });
     pool.addClient('user-pool-client-admin', {
       oAuth: {
         flows: {
           authorizationCodeGrant: true,
         },
-        scopes: [ OAuthScope.OPENID ],
-        callbackUrls: [ 'https://my-app-domain.com/welcome' ],
-        logoutUrls: [ 'https://my-app-domain.com/signin' ],
+        scopes: [ OAuthScope.OPENID, OAuthScope.PROFILE, OAuthScope.EMAIL, OAuthScope.COGNITO_ADMIN],
+        callbackUrls: [ 'http://localhost:4200' ],
+        logoutUrls: [ 'http://localhost:4200/login' ],
       },
     });
 

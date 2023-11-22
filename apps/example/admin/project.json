@@ -13,7 +13,7 @@
         "outputPath": "dist/apps/example/admin",
         "index": "apps/example/admin/src/index.html",
         "main": "apps/example/admin/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": ["zone.js", "apps/example/admin/src/polyfills.ts"],
         "tsConfig": "apps/example/admin/tsconfig.app.json",
         "assets": [
           "apps/example/admin/src/favicon.ico",

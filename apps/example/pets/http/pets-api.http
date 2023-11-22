@@ -1,9 +1,9 @@
-PUT https://9wejt4xyxa.execute-api.eu-central-1.amazonaws.com/prod/pets
+PUT https://n8bpqsk91c.execute-api.eu-central-1.amazonaws.com/prod/pets
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 
 {
   "name": "111",
-  "color": "OqlF9dgfliACGvg="
+  "color": "O0ZQdc16liACF3A="
 }

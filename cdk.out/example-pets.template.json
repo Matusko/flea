@@ -32,7 +32,7 @@
   "petsdomaineventbus4C3E1981": {
    "Type": "AWS::Events::EventBus",
    "Properties": {
-    "Name": "pets2"
+    "Name": "pets"
    },
    "Metadata": {
     "aws:cdk:path": "example-pets/pets/domain-event-bus/event-bus/Resource"
@@ -143,9 +143,13 @@
   "petspublicrestgatewayrootresourcepets31A0AEB9": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
-    "ParentId": "zu9qs4uwok",
+    "ParentId": {
+     "Fn::ImportValue": "flea-example-rootResourceId"
+    },
     "PathPart": "pets",
-    "RestApiId": "9wejt4xyxa"
+    "RestApiId": {
+     "Fn::ImportValue": "flea-example-restApiId"
+    }
    },
    "Metadata": {
     "aws:cdk:path": "example-pets/pets/public-rest-gateway-root-resource/pets/Resource"
@@ -208,7 +212,9 @@
     "ResourceId": {
      "Ref": "petspublicrestgatewayrootresourcepets31A0AEB9"
     },
-    "RestApiId": "9wejt4xyxa"
+    "RestApiId": {
+     "Fn::ImportValue": "flea-example-restApiId"
+    }
    },
    "Metadata": {
     "aws:cdk:path": "example-pets/pets/public-rest-gateway-root-resource/pets/PUT/Resource"
@@ -263,11 +269,13 @@
     "aws:cdk:path": "example-pets/pets/event-store-integration/putEventRole/Resource"
    }
   },
-  "petseventstoreintegrationpublicrestgatewaydeployment83D842F52851712096b64d66856b4bc8a3edba15": {
+  "petseventstoreintegrationpublicrestgatewaydeployment83D842F52cf8565a2336be4d81089a659a0d830c": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
-    "Description": "Sun Nov 19 2023",
-    "RestApiId": "9wejt4xyxa",
+    "Description": "Wed Nov 22 2023",
+    "RestApiId": {
+     "Fn::ImportValue": "flea-example-restApiId"
+    },
     "StageName": "prod"
    },
    "DependsOn": [
@@ -347,7 +355,18 @@
       {
        "Action": "execute-api:ManageConnections",
        "Effect": "Allow",
-       "Resource": "arn:aws:execute-api:eu-central-1:588476158895:876ro4w8qd/prod/POST/@connections/*"
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:execute-api:eu-central-1:588476158895:",
+          {
+           "Fn::ImportValue": "flea-example-webSocketApiId"
+          },
+          "/prod/POST/@connections/*"
+         ]
+        ]
+       }
       }
      ],
      "Version": "2012-10-17"
@@ -368,7 +387,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
-     "S3Key": "21d76d1f9ba551495bcab474edc69c960a81650d47229ff4314ae8307a8e02aa.zip"
+     "S3Key": "a5054baff004b0ec3c488492e1442229b3836bd9eb0f5b1802b96c8b075fb632.zip"
     },
     "Environment": {
      "Variables": {
@@ -391,7 +410,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "example-pets/pets/read-model/event-listener/Resource",
-    "aws:asset:path": "asset.21d76d1f9ba551495bcab474edc69c960a81650d47229ff4314ae8307a8e02aa",
+    "aws:asset:path": "asset.a5054baff004b0ec3c488492e1442229b3836bd9eb0f5b1802b96c8b075fb632",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

@@ -4,7 +4,7 @@ import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk
 export const handler = async (event) => {
   const client = new ApiGatewayManagementApiClient({
     region: 'eu-central-1',
-    endpoint: 'https://876ro4w8qd.execute-api.eu-central-1.amazonaws.com/prod'
+    endpoint: 'https://edaxipnzr1.execute-api.eu-central-1.amazonaws.com/prod'
   });
 
   console.log(JSON.stringify(event));
