@@ -1,0 +1,36 @@
+{
+  "name": "flea-identity-provider-infra",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/flea/identity-provider-infra/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/flea/identity-provider-infra",
+        "main": "libs/flea/identity-provider-infra/src/index.ts",
+        "tsConfig": "libs/flea/identity-provider-infra/tsconfig.lib.json",
+        "assets": ["libs/flea/identity-provider-infra/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/flea/identity-provider-infra/**/*.ts",
+          "libs/flea/identity-provider-infra/package.json"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/flea/identity-provider-infra/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

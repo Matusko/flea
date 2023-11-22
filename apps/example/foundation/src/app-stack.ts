@@ -5,6 +5,7 @@ export class AppStack extends Stack {
     super(scope, id, props);
 
     new FleaFoundation(this, 'example', {
+      name: 'flea-example',
       enablePublicBus: true,
       enableAdmin: true
     });

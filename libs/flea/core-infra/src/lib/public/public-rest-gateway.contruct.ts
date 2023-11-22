@@ -1,12 +1,16 @@
 import {Construct} from 'constructs';
 import {MockIntegration, PassthroughBehavior, RestApi} from 'aws-cdk-lib/aws-apigateway';
 
+export interface FleaRESTGatewayProps {
+  restApiGWName: string;
+}
+
 export class FleaRESTGateway extends Construct {
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, props: FleaRESTGatewayProps) {
     super(scope, id);
 
     const api = new RestApi(this, `${id}-public-rest-gateway`, {
-      restApiName: 'MyApi',
+      restApiName: props.restApiGWName,
     });
 
     const healthResource = api.root.addResource('health')

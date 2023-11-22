@@ -3,7 +3,7 @@
   "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5": {
    "Type": "AWS::ApiGateway::RestApi",
    "Properties": {
-    "Name": "MyApi"
+    "Name": "flea-example"
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Resource"
@@ -64,7 +64,7 @@
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Account"
    }
   },
-  "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD9e8748915956f24dba6af9bbb91a3a481": {
+  "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD98785a803edebe6cc05c7443bb208f285": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Automatically created by the RestApi construct",
@@ -84,7 +84,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD9e8748915956f24dba6af9bbb91a3a481"
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD98785a803edebe6cc05c7443bb208f285"
     },
     "RestApiId": {
      "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
@@ -150,6 +150,80 @@
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Default/health/GET/Resource"
+   }
+  },
+  "exampleidenttyprovideruserpool073DDCBA": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_phone_number",
+       "Priority": 1
+      },
+      {
+       "Name": "verified_email",
+       "Priority": 2
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": true
+    },
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "flea-example",
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/identty-provider/user-pool/Resource"
+   }
+  },
+  "exampleidenttyprovideruserpooluserpoolclientadminFDB1B2E0": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "openid"
+    ],
+    "CallbackURLs": [
+     "https://my-app-domain.com/welcome"
+    ],
+    "LogoutURLs": [
+     "https://my-app-domain.com/signin"
+    ],
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "exampleidenttyprovideruserpool073DDCBA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/identty-provider/user-pool/user-pool-client-admin/Resource"
+   }
+  },
+  "exampleidenttyprovideruserpooldomain58C5048C": {
+   "Type": "AWS::Cognito::UserPoolDomain",
+   "Properties": {
+    "Domain": "flea-example",
+    "UserPoolId": {
+     "Ref": "exampleidenttyprovideruserpool073DDCBA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/identty-provider/user-pool-domain/Resource"
    }
   },
   "exampleadminadminbucketD411474B": {
@@ -410,7 +484,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRTXPCIBD9Ld4JJnrpsdqOMz20dfTQo4NkG4kJZALoOAz/vUvAJD29D5Z9y7KiRZFTly/YXWe8vGaNOFN3NIxfCVonxzpRMQN39qDuANpsOkHefuWMbjhXVhryDl2jHi0gRXemsFsFwYsEryrbc9gyPYnUM/JPMBdVBisyTwRrMV41sQ7RE72mbmv5FYa4xCLsVSP4Y7KTjiLEetKw9lyyk1Ql1Jp+DbCzkhuhJLY+Ma3BaLoJkIqpw4ZjDfI99K3QGpUn05puq6EwLedDGqh69rxyUNZMq/D+3/u/remsIUNmOBeymq/FkzxjTXdhNF+8pu9aBpxnpwr3A+ejCs8Nc4wixo9yPtxoPicLq6G1Xt6KF1qsMbPWQmQ9/rRogR4i/gFhALLXPwIAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11Sy27DIBD8lt4JsZNLj81DlXpoGyWqeowI3jokmLUMThQh/r1g8KM97cww+2BhQfM8ozZ7Ync948V1JsWJ2oNh/Eq8dLSsFiUzcGcPavegzaoWZPOjJnDFObbKkC3UEh8VeOjVCfPVSghaBD4V24bDmumRpJoRv4M5YxGkiBwRrPLtUUafj45wLJUwSO2XhmaHKMPRgHuwkSIN9E/p6RYrJtTUEBVH9JLadcuv0KUnFMMOpeCPUU48knAvRySrTgU7KizgoulHF15bxY1A5UsfmdZgNF2FkMzU+oKDx+MdNJXQ2jNHxne4LTpj2v6bMlA2rE/ZY2vGXTv3Z8GfralbQ7qe4Vyocrp3R7IZk/WZ0ezpJf2HeYjT3slhv+F0wHDdMMdAYvuBTocbxH6ysBp60fNb/kzzpe950ULMGv+VRAV0H+MvsEZpRKACAAA="
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/CDKMetadata/Default"
