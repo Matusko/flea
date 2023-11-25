@@ -158,7 +158,10 @@
   "petspublicrestgatewayrootresourcepetsPUTF1DB4E33": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
-    "AuthorizationType": "NONE",
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "petseventstoreintegrationpublicrestgatewayauthorizer3EE4C4A1"
+    },
     "HttpMethod": "PUT",
     "Integration": {
      "Credentials": {
@@ -269,10 +272,41 @@
     "aws:cdk:path": "example-pets/pets/event-store-integration/putEventRole/Resource"
    }
   },
-  "petseventstoreintegrationpublicrestgatewaydeployment83D842F52cf8565a2336be4d81089a659a0d830c": {
+  "petseventstoreintegrationpublicrestgatewayauthorizer3EE4C4A1": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "IdentitySource": "method.request.header.Authorization",
+    "Name": "examplepetseventstoreintegrationpublicrestgatewayauthorizerBF440367",
+    "ProviderARNs": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":cognito-idp:eu-central-1:588476158895:userpool/",
+        {
+         "Fn::ImportValue": "flea-example-userPoolId"
+        }
+       ]
+      ]
+     }
+    ],
+    "RestApiId": {
+     "Fn::ImportValue": "flea-example-restApiId"
+    },
+    "Type": "COGNITO_USER_POOLS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-pets/pets/event-store-integration/public-rest-gateway-authorizer/Resource"
+   }
+  },
+  "petseventstoreintegrationpublicrestgatewaydeployment83D842F55597c70404baa52b895a93147de6e062": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
-    "Description": "Wed Nov 22 2023",
+    "Description": "Sat Nov 25 2023",
     "RestApiId": {
      "Fn::ImportValue": "flea-example-restApiId"
     },
@@ -468,7 +502,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRTVODMBD9Ld7DWuzFa1F703HQO7MkKwZIwrChHYbJfzeB2urpfSS7+zZ5gDzfwe4Oz5xJ1WW9rmH58Cg7Ea1qUbNF41Q0P7HuSTx92ZUEQSeynmF5SVhMnI6uvJy2uwmD0GhgKd3FSvjuei3nJDcWxKAHYkhGJAIH3aCnM86xkNgfBl0gk4jcTaOkf2Lt+stfyX87lawLe6ahd7OJwZJ5U0H0aGqFlXWKWoa3FY6TlV47K3hfITPFDQ8JooZikh35dfRWCkvseK1I2Wk0mjmqEG7x1gbxTRttm79Zg0ijoeX7U/4I+T5+Q8taZ+NkvTYE5YY/hfuWcaMBAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRyXKDMAz9lt4dNzSXXqHLrZ0Mbc+MMSoRi80gOxnK+N8rQ7P09BZZsp/8IJNkK7d36kQbXbWbDks5fzilW8FWMVeTUb2t2PxUZQfi6dssJAg4gnEk55eImadYuvDcr2cjBoGql3Nu/6yIe9uhnqJcWRADDkAyGkyEGrBWDk5q4kYglw6YKQLB3PpRwz+xTD3zN3AHW0XrzGxt0NkvgnFvbUepZ3vEHxjjoRv1DENnp54TxMJVBdGpvqxUYWwFDcn3BV690Q6tEbQrFBHwKtIIrGXmdQtueePaKmeeeOmIIWHskYhVCNccywBefo2mvg0VRLxaNnR/TB5lsuP/aghxM3rjsAeZr/gLd6tVb8wBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "example-pets/CDKMetadata/Default"

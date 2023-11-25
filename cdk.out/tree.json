@@ -282,7 +282,10 @@
                             "attributes": {
                               "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
                               "aws:cdk:cloudformation:props": {
-                                "authorizationType": "NONE",
+                                "authorizationType": "COGNITO_USER_POOLS",
+                                "authorizerId": {
+                                  "Ref": "petseventstoreintegrationpublicrestgatewayauthorizer3EE4C4A1"
+                                },
                                 "httpMethod": "PUT",
                                 "integration": {
                                   "type": "AWS",
@@ -455,6 +458,60 @@
                       "version": "2.110.0"
                     }
                   },
+                  "user-pool": {
+                    "id": "user-pool",
+                    "path": "example-pets/pets/event-store-integration/user-pool",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "public-rest-gateway-authorizer": {
+                    "id": "public-rest-gateway-authorizer",
+                    "path": "example-pets/pets/event-store-integration/public-rest-gateway-authorizer",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "example-pets/pets/event-store-integration/public-rest-gateway-authorizer/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Authorizer",
+                          "aws:cdk:cloudformation:props": {
+                            "identitySource": "method.request.header.Authorization",
+                            "name": "examplepetseventstoreintegrationpublicrestgatewayauthorizerBF440367",
+                            "providerArns": [
+                              {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    "arn:",
+                                    {
+                                      "Ref": "AWS::Partition"
+                                    },
+                                    ":cognito-idp:eu-central-1:588476158895:userpool/",
+                                    {
+                                      "Fn::ImportValue": "flea-example-userPoolId"
+                                    }
+                                  ]
+                                ]
+                              }
+                            ],
+                            "restApiId": {
+                              "Fn::ImportValue": "flea-example-restApiId"
+                            },
+                            "type": "COGNITO_USER_POOLS"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnAuthorizer",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.CognitoUserPoolsAuthorizer",
+                      "version": "2.110.0"
+                    }
+                  },
                   "public-rest-gateway-deployment": {
                     "id": "public-rest-gateway-deployment",
                     "path": "example-pets/pets/event-store-integration/public-rest-gateway-deployment",
@@ -465,7 +522,7 @@
                         "attributes": {
                           "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
                           "aws:cdk:cloudformation:props": {
-                            "description": "Wed Nov 22 2023",
+                            "description": "Sat Nov 25 2023",
                             "restApiId": {
                               "Fn::ImportValue": "flea-example-restApiId"
                             },

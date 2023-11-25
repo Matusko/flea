@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-deploy-role-588476158895-eu-central-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-cfn-exec-role-588476158895-eu-central-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/f863f1aeff02fcf5837d3089ce9b3a01c03e9ee46130bad5b017ba735fa16294.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/7a570b5b6f729fbe6cba6dc4c460ee43bd1bd57e0a891abc8262c0779a016f77.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -82,10 +82,16 @@
             "data": "petseventstoreintegrationputEventRoleB3FE91FB"
           }
         ],
+        "/example-pets/pets/event-store-integration/public-rest-gateway-authorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "petseventstoreintegrationpublicrestgatewayauthorizer3EE4C4A1"
+          }
+        ],
         "/example-pets/pets/event-store-integration/public-rest-gateway-deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "petseventstoreintegrationpublicrestgatewaydeployment83D842F52cf8565a2336be4d81089a659a0d830c"
+            "data": "petseventstoreintegrationpublicrestgatewaydeployment83D842F55597c70404baa52b895a93147de6e062"
           }
         ],
         "/example-pets/pets/read-model/read-model-table": [

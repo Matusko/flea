@@ -19,7 +19,7 @@ export class FleaFoundation extends Construct {
     super(scope, id);
 
     const restAPiGW = new FleaRESTGateway(this, 'public-gateway', {
-      restApiGWName: props.name
+      restApiGWName: `${props.name}-rest`
     });
 
     const outputs: Array<FleaFoundationOutputItem> = [
@@ -33,8 +33,13 @@ export class FleaFoundation extends Construct {
       }
     ]
 
-    new FleaIdentityProvider(this, 'identty-provider', {
+    const identityProvider = new FleaIdentityProvider(this, 'identty-provider', {
       name: props.name
+    });
+
+    outputs.push({
+      key: 'userPoolId',
+      value: identityProvider.userPool.userPoolId
     });
 
     if (props.enableAdmin) {
@@ -42,7 +47,9 @@ export class FleaFoundation extends Construct {
     }
 
     if (props.enablePublicBus) {
-      const publicBus = new FleaPublicBus(this, 'public-bus');
+      const publicBus = new FleaPublicBus(this, 'public-bus', {
+        apiName: `${props.name}-public-bus`
+      });
       outputs.push({
         key: 'webSocketApiId',
         value: publicBus.fleaWSGateway.webSocketApi.apiId

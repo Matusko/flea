@@ -1,11 +1,13 @@
 import {Construct} from 'constructs';
-import {OAuthScope, UserPool, UserPoolDomain} from 'aws-cdk-lib/aws-cognito';
+import {IUserPool, OAuthScope, UserPool, UserPoolDomain} from 'aws-cdk-lib/aws-cognito';
 
 export interface FleaIdentityProviderProps {
   name: string;
 }
 
 export class FleaIdentityProvider extends Construct {
+  public userPool: IUserPool;
+
   constructor(scope: Construct, id: string, props: FleaIdentityProviderProps) {
     super(scope, id);
 
@@ -32,5 +34,7 @@ export class FleaIdentityProvider extends Construct {
         domainPrefix: props.name
       }
     });
+
+    this.userPool = pool;
   }
 }

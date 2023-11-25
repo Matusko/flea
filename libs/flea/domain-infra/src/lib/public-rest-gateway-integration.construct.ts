@@ -1,6 +1,7 @@
 import {Construct} from 'constructs';
-import {AwsIntegration, Deployment, IResource} from 'aws-cdk-lib/aws-apigateway';
+import {AwsIntegration, CognitoUserPoolsAuthorizer, Deployment, IResource} from 'aws-cdk-lib/aws-apigateway';
 import {Effect, Policy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {UserPool} from 'aws-cdk-lib/aws-cognito';
 
 export interface FleaEventStorePublicGatewayIntegrationProps {
   parentResource: IResource;
@@ -9,7 +10,8 @@ export interface FleaEventStorePublicGatewayIntegrationProps {
   eventStore: {
     tableName: string;
     tableArn: string;
-  }
+  },
+  userPoolId: string;
 }
 
 export class FleaEventStorePublicGatewayIntegration extends Construct {
@@ -66,7 +68,15 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
     });
 
     const domainResource = props.parentResource.addResource(props.domainResourcePath);
+
+    const userPool = UserPool.fromUserPoolId(this, 'user-pool', props.userPoolId);
+
+    const authorizer = new CognitoUserPoolsAuthorizer(this, 'public-rest-gateway-authorizer', {
+      cognitoUserPools: [userPool]
+    });
+
     domainResource.addMethod('PUT', putEventIntegration, {
+      authorizer,
       methodResponses: [
         {
           statusCode: '202',

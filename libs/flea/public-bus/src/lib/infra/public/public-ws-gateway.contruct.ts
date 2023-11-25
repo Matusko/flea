@@ -4,11 +4,15 @@ import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2-alpha';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 
+export interface FleaWSGatewayProps {
+  name: string;
+}
+
 export class FleaWSGateway extends Construct {
   public webSocketApi: WebSocketApi;
   public webSocketStage: WebSocketStage;
 
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, props: FleaWSGatewayProps) {
     super(scope, id);
 
     const connectHandlerFn = new NodejsFunction(this, 'connect-handler', {
@@ -17,6 +21,7 @@ export class FleaWSGateway extends Construct {
     });
 
     const webSocketApi = new WebSocketApi(this, 'mywsapi', {
+      apiName: props.name,
       connectRouteOptions: {
         integration: new WebSocketLambdaIntegration('connetc-handler-integration', connectHandlerFn)
       },

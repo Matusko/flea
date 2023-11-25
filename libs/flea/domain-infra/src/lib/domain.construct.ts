@@ -6,7 +6,6 @@ import {FleaEventBus} from './event-bus.construct';
 import {
   FleaReadModel,
   ReadModelPublicBusIntegrationBaseProps,
-  ReadModelPublicBusIntegrationProps
 } from './read-model.construct';
 import {NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {Fn} from 'aws-cdk-lib';
@@ -27,6 +26,7 @@ export class FleaDomain extends Construct {
     const restApiId = Fn.importValue(`${props.foundationName}-restApiId`);
     const rootResourceId = Fn.importValue(`${props.foundationName}-rootResourceId`);
     const webSocketApiId = Fn.importValue(`${props.foundationName}-webSocketApiId`);
+    const userPoolId = Fn.importValue(`${props.foundationName}-userPoolId`);
 
     const eventStore = new FleaEventStore(this, 'event-store');
 
@@ -49,7 +49,8 @@ export class FleaDomain extends Construct {
       eventStore: {
         tableName: eventStore.table.tableName,
         tableArn: eventStore.table.tableArn
-      }
+      },
+      userPoolId
     });
 
     new FleaReadModel(this, 'read-model', {

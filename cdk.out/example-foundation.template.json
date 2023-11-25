@@ -3,7 +3,7 @@
   "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5": {
    "Type": "AWS::ApiGateway::RestApi",
    "Properties": {
-    "Name": "flea-example"
+    "Name": "flea-example-rest"
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Resource"
@@ -64,7 +64,7 @@
     "aws:cdk:path": "example-foundation/example/public-gateway/public-gateway-public-rest-gateway/Account"
    }
   },
-  "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD98785a803edebe6cc05c7443bb208f285": {
+  "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD97c9f555341756c6a62571414c46deee5": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Automatically created by the RestApi construct",
@@ -84,7 +84,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD98785a803edebe6cc05c7443bb208f285"
+     "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayDeployment30FF0FD97c9f555341756c6a62571414c46deee5"
     },
     "RestApiId": {
      "Ref": "examplepublicgatewaypublicgatewaypublicrestgatewayED10B4D5"
@@ -382,7 +382,7 @@
   "examplepublicbuswsgatewaymywsapi0A506069": {
    "Type": "AWS::ApiGatewayV2::Api",
    "Properties": {
-    "Name": "mywsapi",
+    "Name": "flea-example-public-bus",
     "ProtocolType": "WEBSOCKET",
     "RouteSelectionExpression": "$request.body.action"
    },
@@ -540,6 +540,14 @@
    },
    "Export": {
     "Name": "flea-example-rootResourceId"
+   }
+  },
+  "exampleoutputsoutputuserPoolId7B225563": {
+   "Value": {
+    "Ref": "exampleidenttyprovideruserpool073DDCBA"
+   },
+   "Export": {
+    "Name": "flea-example-userPoolId"
    }
   },
   "exampleoutputsoutputwebSocketApiIdF6EBE3B3": {
