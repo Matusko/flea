@@ -48,7 +48,11 @@ export class FleaFoundation extends Construct {
 
     if (props.enablePublicBus) {
       const publicBus = new FleaPublicBus(this, 'public-bus', {
-        apiName: `${props.name}-public-bus`
+        apiName: `${props.name}-public-bus`,
+        authorization: {
+          userPoolId: identityProvider.userPool.userPoolId,
+          appClientId: identityProvider.client.userPoolClientId
+        }
       });
       outputs.push({
         key: 'webSocketApiId',

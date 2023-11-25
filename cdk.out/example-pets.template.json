@@ -21,7 +21,8 @@
     },
     "StreamSpecification": {
      "StreamViewType": "NEW_IMAGE"
-    }
+    },
+    "TableName": "pets-event-store"
    },
    "UpdateReplacePolicy": "Retain",
    "DeletionPolicy": "Retain",

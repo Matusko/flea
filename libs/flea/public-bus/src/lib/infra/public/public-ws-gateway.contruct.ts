@@ -3,9 +3,17 @@ import { WebSocketLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integratio
 import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2-alpha';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
+import {WebSocketLambdaAuthorizer} from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
+import {AttributeType, Table} from 'aws-cdk-lib/aws-dynamodb';
+
+export interface FleaWSGatewayAuthorizationProps {
+  userPoolId: string;
+  appClientId: string;
+}
 
 export interface FleaWSGatewayProps {
   name: string;
+  authorization: FleaWSGatewayAuthorizationProps;
 }
 
 export class FleaWSGateway extends Construct {
@@ -15,18 +23,53 @@ export class FleaWSGateway extends Construct {
   constructor(scope: Construct, id: string, props: FleaWSGatewayProps) {
     super(scope, id);
 
+    const connectionsTable = new Table(this, 'connection-store-table', {
+      tableName: 'public-bus-connection-table',
+      partitionKey: {
+        name: 'id',
+        type: AttributeType.STRING,
+      },
+    });
+
     const connectHandlerFn = new NodejsFunction(this, 'connect-handler', {
       functionName: 'public-bus-connect-handler',
       entry: path.join(__dirname, '../../app/connect-handler/index.ts'),
     });
 
-    const webSocketApi = new WebSocketApi(this, 'mywsapi', {
+    connectionsTable.grantReadWriteData(connectHandlerFn);
+
+    const disconnectHandlerFn = new NodejsFunction(this, 'disconnect-handler', {
+      functionName: 'public-bus-disconnect-handler',
+      entry: path.join(__dirname, '../../app/disconnect-handler/index.ts'),
+    });
+
+    connectionsTable.grantReadWriteData(disconnectHandlerFn);
+
+
+    const authorizerFn = new NodejsFunction(this, 'authorizer-lambda', {
+      functionName: 'authorizer',
+      entry: path.join(__dirname, '../../app/authorizer/index.ts'),
+      environment: {
+        'USER_POOL_ID': props.authorization.userPoolId,
+        'APP_CLIENT_ID': props.authorization.appClientId,
+      }
+    });
+
+    const authorizer = new WebSocketLambdaAuthorizer("authorizer", authorizerFn, {
+      identitySource: ['route.request.querystring.idToken'],
+    });
+
+    const webSocketApi = new WebSocketApi(this, 'websocket-api', {
       apiName: props.name,
       connectRouteOptions: {
-        integration: new WebSocketLambdaIntegration('connetc-handler-integration', connectHandlerFn)
+        authorizer,
+        integration: new WebSocketLambdaIntegration('connect-handler-integration', connectHandlerFn)
       },
+      disconnectRouteOptions: {
+        integration: new WebSocketLambdaIntegration('connect-handler-integration', disconnectHandlerFn)
+      }
     });
-    const webSocketStage = new WebSocketStage(this, 'mystage', {
+    const webSocketStage = new WebSocketStage(this, 'websocket-api-stage', {
       webSocketApi,
       stageName: 'prod',
       autoDeploy: true,

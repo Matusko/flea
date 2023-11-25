@@ -1,8 +1,9 @@
 import {Construct} from 'constructs';
-import {FleaWSGateway} from './infra/public/public-ws-gateway.contruct';
+import {FleaWSGateway, FleaWSGatewayAuthorizationProps} from './infra/public/public-ws-gateway.contruct';
 
 export interface FleaPublicBusProps {
   apiName: string;
+  authorization: FleaWSGatewayAuthorizationProps;
 }
 
 export class FleaPublicBus extends Construct {
@@ -11,7 +12,8 @@ export class FleaPublicBus extends Construct {
     super(scope, id);
 
     this.fleaWSGateway = new FleaWSGateway(this, 'ws-gateway', {
-      name: props.apiName
+      name: props.apiName,
+      authorization: props.authorization,
     });
 
   }

@@ -1,5 +1,5 @@
 import {Construct} from 'constructs';
-import {IUserPool, OAuthScope, UserPool, UserPoolDomain} from 'aws-cdk-lib/aws-cognito';
+import {IUserPool, IUserPoolClient, OAuthScope, UserPool, UserPoolDomain} from 'aws-cdk-lib/aws-cognito';
 
 export interface FleaIdentityProviderProps {
   name: string;
@@ -7,6 +7,7 @@ export interface FleaIdentityProviderProps {
 
 export class FleaIdentityProvider extends Construct {
   public userPool: IUserPool;
+  public client: IUserPoolClient;
 
   constructor(scope: Construct, id: string, props: FleaIdentityProviderProps) {
     super(scope, id);
@@ -17,7 +18,7 @@ export class FleaIdentityProvider extends Construct {
         email: true
       }
     });
-    pool.addClient('user-pool-client-admin', {
+    const client = pool.addClient('user-pool-client-admin', {
       oAuth: {
         flows: {
           authorizationCodeGrant: true,
@@ -36,5 +37,6 @@ export class FleaIdentityProvider extends Construct {
     });
 
     this.userPool = pool;
+    this.client = client;
   }
 }
