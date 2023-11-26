@@ -53,11 +53,14 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
                 "id": {
                   "S": "$context.requestId"
                 },
-                "Name": {
+                "userId": {
+                  "S": "$context.authorizer.claims.sub"
+                },
+                "name": {
                   "S": "$input.path('$.name')"
                 },
-                "Color": {
-                  "S": "$input.path('$.color')"
+                "type": {
+                  "S": "$input.path('$.type')"
                 }
               },
               "TableName": "${props.eventStore.tableName}"

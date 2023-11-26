@@ -1,28 +1,49 @@
-import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
+import {EventBridgeClient, PutEventsCommand} from '@aws-sdk/client-eventbridge';
 
+const eventBusArn = process.env.EVENT_BUS_ARN!;
+
+const client = new EventBridgeClient({});
 
 export const handler = async (event) => {
-  const client = new ApiGatewayManagementApiClient({
-    region: 'eu-central-1',
-    endpoint: 'https://edaxipnzr1.execute-api.eu-central-1.amazonaws.com/prod'
-  });
-
   console.log(JSON.stringify(event));
-  const color = event.detail.dynamodb.NewImage.Color.S;
-  console.log(`color is: ${color}`);
 
-  const requestParams = {
-    ConnectionId: color,
-    Data: `{"msg": "${event.id}"}`,
+  if (event['detail-type'] === 'pets/UpsertPet') {
+    return {
+      "status": "ok yeah"
+    }
+  }
+
+  const putEvent = {
+    Entries: [
+      {
+        Detail: JSON.stringify(
+          {
+            meta: {
+              scope: [
+                'public'
+              ],
+              userId: event.detail.dynamodb.NewImage.userId.S
+            },
+            data: {
+              name: event.detail.dynamodb.NewImage.name.S,
+              type: event.detail.dynamodb.NewImage.type.S
+            }
+          }
+        ),
+        Source: 'com.sample',
+        DetailType: 'pets/UpsertPet',
+        EventBusName: eventBusArn
+      },
+    ]
   };
 
-  const command = new PostToConnectionCommand(requestParams);
+  console.log(`Send event: ${JSON.stringify(putEvent)}`);
 
-  try {
-    await client.send(command);
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await client.send(
+    new PutEventsCommand(putEvent),
+  );
+
+  console.log(`PutEvents response: ${JSON.stringify(response)}`);
 
   return {
     "status": "ok yeah"

@@ -3,7 +3,8 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer xxxxx
+
 {
   "name": "111",
-  "color": "O0ZQdc16liACF3A="
+  "type": "aaa"
 }

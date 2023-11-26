@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-deploy-role-588476158895-eu-central-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::588476158895:role/cdk-hnb659fds-cfn-exec-role-588476158895-eu-central-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/6f4cba7dd7cf7312571dc311af1d47b7af5e7ade69fefe51b525ae42f80495a9.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-588476158895-eu-central-1/f95c0fba9d93840f9e60844e0fbc0cd96d2066c1a2947456a46e975ce554a008.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -110,6 +110,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "exampleadminadminbucketPolicy6E1DF9C3"
+          }
+        ],
+        "/example-foundation/example/public-bus/public-event-bus/public-event-bus/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspubliceventbusF1845D13"
           }
         ],
         "/example-foundation/example/public-bus/ws-gateway/connection-store-table": [
@@ -234,6 +240,36 @@
             "data": "examplepublicbuswsgatewaywebsocketapistage6167232A"
           }
         ],
+        "/example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2"
+          }
+        ],
+        "/example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspublicserverpushmessengerServiceRoleDefaultPolicyCC1EDF00"
+          }
+        ],
+        "/example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspublicserverpushmessenger241032BB"
+          }
+        ],
+        "/example-foundation/example/public-bus/public-server-push-messenger/rule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspublicserverpushmessengerruleB38182A1"
+          }
+        ],
+        "/example-foundation/example/public-bus/public-server-push-messenger/rule/AllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "examplepublicbuspublicserverpushmessengerruleAllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29B0EDA372"
+          }
+        ],
         "/example-foundation/example/outputs/output-restApiId": [
           {
             "type": "aws:cdk:logicalId",
@@ -256,6 +292,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "exampleoutputsoutputwebSocketApiIdF6EBE3B3"
+          }
+        ],
+        "/example-foundation/example/outputs/output-publicEventBusName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "exampleoutputsoutputpublicEventBusName0CDB347A"
           }
         ],
         "/example-foundation/CDKMetadata/Default": [

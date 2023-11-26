@@ -7,7 +7,9 @@ export class AppStack extends Stack {
     new FleaFoundation(this, 'example', {
       name: 'flea-example',
       enablePublicBus: true,
-      enableAdmin: true
+      enableAdmin: true,
+      region: props.env.region,
+      account: props.env.account
     });
   }
 }

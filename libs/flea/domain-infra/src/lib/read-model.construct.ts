@@ -36,11 +36,16 @@ export class FleaReadModel extends Construct {
       },
     });
 
-    const fn = new NodejsFunction(this, 'event-listener', props.eventListenerProps);
+    const fn = new NodejsFunction(this, 'event-listener', {
+      ...props.eventListenerProps,
+      environment: {
+        EVENT_BUS_ARN: props.eventBus.eventBusArn
+      }
+    });
 
     fn.addToRolePolicy(new PolicyStatement({
-      resources: [`arn:aws:execute-api:${props.publicBus.region}:${props.publicBus.account}:${props.publicBus.webSocketApiId}/${props.publicBus.stage}/POST/@connections/*`],
-      actions: ['execute-api:ManageConnections'],
+      resources: [props.eventBus.eventBusArn],
+      actions: ['events:PutEvents'],
       effect: Effect.ALLOW,
     }));
 

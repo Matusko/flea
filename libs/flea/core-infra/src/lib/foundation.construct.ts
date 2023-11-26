@@ -12,6 +12,8 @@ export interface FleaFoundationProps {
   name: string;
   enablePublicBus: boolean;
   enableAdmin: boolean;
+  account: string;
+  region: string;
 }
 
 export class FleaFoundation extends Construct {
@@ -52,12 +54,20 @@ export class FleaFoundation extends Construct {
         authorization: {
           userPoolId: identityProvider.userPool.userPoolId,
           appClientId: identityProvider.client.userPoolClientId
+        },
+        account: props.account,
+        region: props.region
+      });
+      outputs.push(
+        {
+          key: 'webSocketApiId',
+          value: publicBus.fleaWSGateway.webSocketApi.apiId
+        },
+        {
+          key: 'publicEventBusName',
+          value: publicBus.bus.eventBusName
         }
-      });
-      outputs.push({
-        key: 'webSocketApiId',
-        value: publicBus.fleaWSGateway.webSocketApi.apiId
-      });
+      );
     }
 
     new FleaFoundationOutputs(this, 'outputs', {

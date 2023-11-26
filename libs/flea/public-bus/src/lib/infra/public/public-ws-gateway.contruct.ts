@@ -4,7 +4,7 @@ import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2-alpha';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 import {WebSocketLambdaAuthorizer} from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
-import {AttributeType, Table} from 'aws-cdk-lib/aws-dynamodb';
+import {AttributeType, ITable, Table} from 'aws-cdk-lib/aws-dynamodb';
 
 export interface FleaWSGatewayAuthorizationProps {
   userPoolId: string;
@@ -19,11 +19,12 @@ export interface FleaWSGatewayProps {
 export class FleaWSGateway extends Construct {
   public webSocketApi: WebSocketApi;
   public webSocketStage: WebSocketStage;
+  public connectionTable: ITable;
 
   constructor(scope: Construct, id: string, props: FleaWSGatewayProps) {
     super(scope, id);
 
-    const connectionsTable = new Table(this, 'connection-store-table', {
+    const connectionTable = new Table(this, 'connection-store-table', {
       tableName: 'public-bus-connection-table',
       partitionKey: {
         name: 'id',
@@ -31,19 +32,24 @@ export class FleaWSGateway extends Construct {
       },
     });
 
+    connectionTable.addGlobalSecondaryIndex({
+      indexName: 'userIdIndex',
+      partitionKey: {name: 'userId', type: AttributeType.STRING},
+    });
+
     const connectHandlerFn = new NodejsFunction(this, 'connect-handler', {
       functionName: 'public-bus-connect-handler',
       entry: path.join(__dirname, '../../app/connect-handler/index.ts'),
     });
 
-    connectionsTable.grantReadWriteData(connectHandlerFn);
+    connectionTable.grantReadWriteData(connectHandlerFn);
 
     const disconnectHandlerFn = new NodejsFunction(this, 'disconnect-handler', {
       functionName: 'public-bus-disconnect-handler',
       entry: path.join(__dirname, '../../app/disconnect-handler/index.ts'),
     });
 
-    connectionsTable.grantReadWriteData(disconnectHandlerFn);
+    connectionTable.grantReadWriteData(disconnectHandlerFn);
 
 
     const authorizerFn = new NodejsFunction(this, 'authorizer-lambda', {
@@ -77,6 +83,6 @@ export class FleaWSGateway extends Construct {
 
     this.webSocketApi = webSocketApi;
     this.webSocketStage = webSocketStage;
-
+    this.connectionTable = connectionTable;
   }
 }

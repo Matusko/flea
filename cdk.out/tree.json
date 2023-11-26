@@ -535,6 +535,40 @@
                 "id": "public-bus",
                 "path": "example-foundation/example/public-bus",
                 "children": {
+                  "public-event-bus": {
+                    "id": "public-event-bus",
+                    "path": "example-foundation/example/public-bus/public-event-bus",
+                    "children": {
+                      "public-event-bus": {
+                        "id": "public-event-bus",
+                        "path": "example-foundation/example/public-bus/public-event-bus/public-event-bus",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "example-foundation/example/public-bus/public-event-bus/public-event-bus/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Events::EventBus",
+                              "aws:cdk:cloudformation:props": {
+                                "name": "public-event-bus"
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_events.CfnEventBus",
+                              "version": "2.110.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_events.EventBus",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.3.0"
+                    }
+                  },
                   "ws-gateway": {
                     "id": "ws-gateway",
                     "path": "example-foundation/example/public-bus/ws-gateway",
@@ -553,6 +587,28 @@
                                   {
                                     "attributeName": "id",
                                     "attributeType": "S"
+                                  },
+                                  {
+                                    "attributeName": "userId",
+                                    "attributeType": "S"
+                                  }
+                                ],
+                                "globalSecondaryIndexes": [
+                                  {
+                                    "indexName": "userIdIndex",
+                                    "keySchema": [
+                                      {
+                                        "attributeName": "userId",
+                                        "keyType": "HASH"
+                                      }
+                                    ],
+                                    "projection": {
+                                      "projectionType": "ALL"
+                                    },
+                                    "provisionedThroughput": {
+                                      "readCapacityUnits": 5,
+                                      "writeCapacityUnits": 5
+                                    }
                                   }
                                 ],
                                 "keySchema": [
@@ -678,7 +734,18 @@
                                                   ]
                                                 },
                                                 {
-                                                  "Ref": "AWS::NoValue"
+                                                  "Fn::Join": [
+                                                    "",
+                                                    [
+                                                      {
+                                                        "Fn::GetAtt": [
+                                                          "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+                                                          "Arn"
+                                                        ]
+                                                      },
+                                                      "/index/*"
+                                                    ]
+                                                  ]
                                                 }
                                               ]
                                             }
@@ -864,7 +931,18 @@
                                                   ]
                                                 },
                                                 {
-                                                  "Ref": "AWS::NoValue"
+                                                  "Fn::Join": [
+                                                    "",
+                                                    [
+                                                      {
+                                                        "Fn::GetAtt": [
+                                                          "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+                                                          "Arn"
+                                                        ]
+                                                      },
+                                                      "/index/*"
+                                                    ]
+                                                  ]
                                                 }
                                               ]
                                             }
@@ -1485,6 +1563,318 @@
                       "fqn": "constructs.Construct",
                       "version": "10.3.0"
                     }
+                  },
+                  "public-server-push-messenger": {
+                    "id": "public-server-push-messenger",
+                    "path": "example-foundation/example/public-bus/public-server-push-messenger",
+                    "children": {
+                      "public-server-push-messenger": {
+                        "id": "public-server-push-messenger",
+                        "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger",
+                        "children": {
+                          "ServiceRole": {
+                            "id": "ServiceRole",
+                            "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole",
+                            "children": {
+                              "ImportServiceRole": {
+                                "id": "ImportServiceRole",
+                                "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/ImportServiceRole",
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.Resource",
+                                  "version": "2.110.0"
+                                }
+                              },
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                                  "aws:cdk:cloudformation:props": {
+                                    "assumeRolePolicyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": "sts:AssumeRole",
+                                          "Effect": "Allow",
+                                          "Principal": {
+                                            "Service": "lambda.amazonaws.com"
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "managedPolicyArns": [
+                                      {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:",
+                                            {
+                                              "Ref": "AWS::Partition"
+                                            },
+                                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                                          ]
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                                  "version": "2.110.0"
+                                }
+                              },
+                              "DefaultPolicy": {
+                                "id": "DefaultPolicy",
+                                "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/DefaultPolicy",
+                                "children": {
+                                  "Resource": {
+                                    "id": "Resource",
+                                    "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/DefaultPolicy/Resource",
+                                    "attributes": {
+                                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                      "aws:cdk:cloudformation:props": {
+                                        "policyDocument": {
+                                          "Statement": [
+                                            {
+                                              "Action": [
+                                                "dynamodb:BatchGetItem",
+                                                "dynamodb:GetRecords",
+                                                "dynamodb:GetShardIterator",
+                                                "dynamodb:Query",
+                                                "dynamodb:GetItem",
+                                                "dynamodb:Scan",
+                                                "dynamodb:ConditionCheckItem",
+                                                "dynamodb:DescribeTable"
+                                              ],
+                                              "Effect": "Allow",
+                                              "Resource": [
+                                                {
+                                                  "Fn::GetAtt": [
+                                                    "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+                                                    "Arn"
+                                                  ]
+                                                },
+                                                {
+                                                  "Fn::Join": [
+                                                    "",
+                                                    [
+                                                      {
+                                                        "Fn::GetAtt": [
+                                                          "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+                                                          "Arn"
+                                                        ]
+                                                      },
+                                                      "/index/*"
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "Action": "execute-api:ManageConnections",
+                                              "Effect": "Allow",
+                                              "Resource": {
+                                                "Fn::Join": [
+                                                  "",
+                                                  [
+                                                    "arn:aws:execute-api:eu-central-1:588476158895:",
+                                                    {
+                                                      "Ref": "examplepublicbuswsgatewaywebsocketapiFF842884"
+                                                    },
+                                                    "/prod/POST/@connections/*"
+                                                  ]
+                                                ]
+                                              }
+                                            }
+                                          ],
+                                          "Version": "2012-10-17"
+                                        },
+                                        "policyName": "examplepublicbuspublicserverpushmessengerServiceRoleDefaultPolicyCC1EDF00",
+                                        "roles": [
+                                          {
+                                            "Ref": "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "constructInfo": {
+                                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                      "version": "2.110.0"
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                                  "version": "2.110.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Role",
+                              "version": "2.110.0"
+                            }
+                          },
+                          "Code": {
+                            "id": "Code",
+                            "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Code",
+                            "children": {
+                              "Stage": {
+                                "id": "Stage",
+                                "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Code/Stage",
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.AssetStaging",
+                                  "version": "2.110.0"
+                                }
+                              },
+                              "AssetBucket": {
+                                "id": "AssetBucket",
+                                "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Code/AssetBucket",
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                                  "version": "2.110.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                              "version": "2.110.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                              "aws:cdk:cloudformation:props": {
+                                "code": {
+                                  "s3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+                                  "s3Key": "6a196aae66008a00f590eaf9e7997e30c4fad222c57696be45683cb26bb65c05.zip"
+                                },
+                                "environment": {
+                                  "variables": {
+                                    "WS_EXECUTE_ENDPOINT": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "https://",
+                                          {
+                                            "Ref": "examplepublicbuswsgatewaywebsocketapiFF842884"
+                                          },
+                                          ".execute-api.eu-central-1.",
+                                          {
+                                            "Ref": "AWS::URLSuffix"
+                                          },
+                                          "/prod"
+                                        ]
+                                      ]
+                                    },
+                                    "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+                                  }
+                                },
+                                "functionName": "public-server-push-messenger",
+                                "handler": "index.handler",
+                                "role": {
+                                  "Fn::GetAtt": [
+                                    "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2",
+                                    "Arn"
+                                  ]
+                                },
+                                "runtime": "nodejs16.x"
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                              "version": "2.110.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_lambda_nodejs.NodejsFunction",
+                          "version": "2.110.0"
+                        }
+                      },
+                      "rule": {
+                        "id": "rule",
+                        "path": "example-foundation/example/public-bus/public-server-push-messenger/rule",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "example-foundation/example/public-bus/public-server-push-messenger/rule/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Events::Rule",
+                              "aws:cdk:cloudformation:props": {
+                                "eventBusName": {
+                                  "Ref": "examplepublicbuspubliceventbusF1845D13"
+                                },
+                                "eventPattern": {
+                                  "source": [
+                                    "com.sample"
+                                  ],
+                                  "detail": {
+                                    "meta": {
+                                      "scope": [
+                                        "public"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "state": "ENABLED",
+                                "targets": [
+                                  {
+                                    "id": "Target0",
+                                    "arn": {
+                                      "Fn::GetAtt": [
+                                        "examplepublicbuspublicserverpushmessenger241032BB",
+                                        "Arn"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_events.CfnRule",
+                              "version": "2.110.0"
+                            }
+                          },
+                          "AllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29": {
+                            "id": "AllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29",
+                            "path": "example-foundation/example/public-bus/public-server-push-messenger/rule/AllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                              "aws:cdk:cloudformation:props": {
+                                "action": "lambda:InvokeFunction",
+                                "functionName": {
+                                  "Fn::GetAtt": [
+                                    "examplepublicbuspublicserverpushmessenger241032BB",
+                                    "Arn"
+                                  ]
+                                },
+                                "principal": "events.amazonaws.com",
+                                "sourceArn": {
+                                  "Fn::GetAtt": [
+                                    "examplepublicbuspublicserverpushmessengerruleB38182A1",
+                                    "Arn"
+                                  ]
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                              "version": "2.110.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_events.Rule",
+                          "version": "2.110.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.3.0"
+                    }
                   }
                 },
                 "constructInfo": {
@@ -1523,6 +1913,14 @@
                   "output-webSocketApiId": {
                     "id": "output-webSocketApiId",
                     "path": "example-foundation/example/outputs/output-webSocketApiId",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnOutput",
+                      "version": "2.110.0"
+                    }
+                  },
+                  "output-publicEventBusName": {
+                    "id": "output-publicEventBusName",
+                    "path": "example-foundation/example/outputs/output-publicEventBusName",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.CfnOutput",
                       "version": "2.110.0"

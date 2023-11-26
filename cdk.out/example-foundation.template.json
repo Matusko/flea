@@ -313,6 +313,15 @@
     "aws:cdk:path": "example-foundation/example/admin-admin-bucket/Policy/Resource"
    }
   },
+  "examplepublicbuspubliceventbusF1845D13": {
+   "Type": "AWS::Events::EventBus",
+   "Properties": {
+    "Name": "public-event-bus"
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-event-bus/public-event-bus/Resource"
+   }
+  },
   "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB": {
    "Type": "AWS::DynamoDB::Table",
    "Properties": {
@@ -320,6 +329,28 @@
      {
       "AttributeName": "id",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     }
+    ],
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "userIdIndex",
+      "KeySchema": [
+       {
+        "AttributeName": "userId",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+       "ReadCapacityUnits": 5,
+       "WriteCapacityUnits": 5
+      }
      }
     ],
     "KeySchema": [
@@ -403,7 +434,18 @@
          ]
         },
         {
-         "Ref": "AWS::NoValue"
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
         }
        ]
       }
@@ -517,7 +559,18 @@
          ]
         },
         {
-         "Ref": "AWS::NoValue"
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
         }
        ]
       }
@@ -911,10 +964,220 @@
     "aws:cdk:path": "example-foundation/example/public-bus/ws-gateway/websocket-api-stage/Resource"
    }
   },
+  "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/Resource"
+   }
+  },
+  "examplepublicbuspublicserverpushmessengerServiceRoleDefaultPolicyCC1EDF00": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "examplepublicbuswsgatewayconnectionstoretableB0D8BBDB",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "execute-api:ManageConnections",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:execute-api:eu-central-1:588476158895:",
+          {
+           "Ref": "examplepublicbuswsgatewaywebsocketapiFF842884"
+          },
+          "/prod/POST/@connections/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "examplepublicbuspublicserverpushmessengerServiceRoleDefaultPolicyCC1EDF00",
+    "Roles": [
+     {
+      "Ref": "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "examplepublicbuspublicserverpushmessenger241032BB": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-588476158895-eu-central-1",
+     "S3Key": "6a196aae66008a00f590eaf9e7997e30c4fad222c57696be45683cb26bb65c05.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "WS_EXECUTE_ENDPOINT": {
+       "Fn::Join": [
+        "",
+        [
+         "https://",
+         {
+          "Ref": "examplepublicbuswsgatewaywebsocketapiFF842884"
+         },
+         ".execute-api.eu-central-1.",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/prod"
+        ]
+       ]
+      },
+      "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1"
+     }
+    },
+    "FunctionName": "public-server-push-messenger",
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs16.x"
+   },
+   "DependsOn": [
+    "examplepublicbuspublicserverpushmessengerServiceRoleDefaultPolicyCC1EDF00",
+    "examplepublicbuspublicserverpushmessengerServiceRoleD08514F2"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-server-push-messenger/public-server-push-messenger/Resource",
+    "aws:asset:path": "asset.6a196aae66008a00f590eaf9e7997e30c4fad222c57696be45683cb26bb65c05",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "examplepublicbuspublicserverpushmessengerruleB38182A1": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "EventBusName": {
+     "Ref": "examplepublicbuspubliceventbusF1845D13"
+    },
+    "EventPattern": {
+     "source": [
+      "com.sample"
+     ],
+     "detail": {
+      "meta": {
+       "scope": [
+        "public"
+       ]
+      }
+     }
+    },
+    "State": "ENABLED",
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "examplepublicbuspublicserverpushmessenger241032BB",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-server-push-messenger/rule/Resource"
+   }
+  },
+  "examplepublicbuspublicserverpushmessengerruleAllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29B0EDA372": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "examplepublicbuspublicserverpushmessenger241032BB",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "examplepublicbuspublicserverpushmessengerruleB38182A1",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "example-foundation/example/public-bus/public-server-push-messenger/rule/AllowEventRuleexamplefoundationexamplepublicbuspublicserverpushmessengerFDBB1E29"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11STXPCIBD9Ld4JJnrpsVGnMz20dbSdHh1CaEQJmwmgk2b474WQL3va9x67y2OXFU6SGLfxgtxVRPNrJHiG26Mm9IqcdGpJxQui2Z00uD0wpdOKo+2PnMGUUjBSox2rBDQlc9CpM+a6FcxrAbhSMDVlG6Im0vcM+I3pM+ReCsgiTkp3PYiQ5+MeBKeNpwFZRKGQXANuvxSr9wDCH454AFvBe4f/lIHuoCRczhOCYpFa43Zj6JV15T0KYXLzwAPxD7UobyQpIXfT/SRZeEgHLBKkzHJykpCzi8LvXXgxkmoO0l16IkoxrXDqQ5+MW1c+5vghsLrkSjlm0bSy26pL7Bf1KjUrajKUHMDozkZq3JBr/svqcUnWPmzmw+jKaNQ58OdcFvOFWRRHRFRnguPFc/+Rlj7OnfQZ7TfLjuDH4l2NJJgZ6dzqVDD5HLXBrR8evqjlLXnCydr5uCjOo9r9S14yfAjxD7sRngHtAgAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11Sy1LDIBT9lu4JTduNS9OqMy7UTqrjskPINaVNIBOgncjw70LIq67Og3vhwGWNV6sYm3hBbjKi+SUqWYbNQRF6Qc46GlKzgii4kRabFKRKaoZ2P3xGE0qF5go9QV2KtgJHnTtTbrcCvBeIaxW6obAlchL9noG/gTqJ3FuBWcRI5Y4XZajzuBclo62XgVlERcGZEth8SWj2QpR+ceQD2ZWsT/jPGeSTqAjj84LgWCQ32Gw1vUDX3rMAU5o7HYS/qEVwdadIbJ49brX0xSNPdX81hxblLSeVyN0gPkkWFjpiUUmqLCdHLnI4S/zewYvmVDHBXb4jkRLcIYmHvhgb1z7W+PeCpmJSOmXRNN3ruivsZ/rKFRQNGVpSoVUXI9FuHg37hWacp7V3Q/zQqtYKdQn8OuPFfLYWxREp6xPB8eKx/3NLj/MkfYX5huwg/Av6VKMIYUY5jzo1TDlHb0jrHw+f5fK6esCrjctxloxFjfvCrAKcBvwDqlW0ZxgDAAA="
    },
    "Metadata": {
     "aws:cdk:path": "example-foundation/CDKMetadata/Default"
@@ -977,6 +1240,14 @@
    },
    "Export": {
     "Name": "flea-example-webSocketApiId"
+   }
+  },
+  "exampleoutputsoutputpublicEventBusName0CDB347A": {
+   "Value": {
+    "Ref": "examplepublicbuspubliceventbusF1845D13"
+   },
+   "Export": {
+    "Name": "flea-example-publicEventBusName"
    }
   }
  },

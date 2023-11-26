@@ -27,6 +27,7 @@ export class FleaDomain extends Construct {
     const rootResourceId = Fn.importValue(`${props.foundationName}-rootResourceId`);
     const webSocketApiId = Fn.importValue(`${props.foundationName}-webSocketApiId`);
     const userPoolId = Fn.importValue(`${props.foundationName}-userPoolId`);
+    const publicEventBusName = Fn.importValue(`${props.foundationName}-publicEventBusName`);
 
     const eventStore = new FleaEventStore(this, 'event-store', {
       domainName: props.name
@@ -34,7 +35,8 @@ export class FleaDomain extends Construct {
 
     const eventBus = new FleaEventBus(this, 'domain-event-bus', {
       domainName: props.name,
-      eventStore
+      eventStore,
+      publicEventBusName
     });
 
     const api = RestApi.fromRestApiId(this, 'public-rest-gateway', restApiId);

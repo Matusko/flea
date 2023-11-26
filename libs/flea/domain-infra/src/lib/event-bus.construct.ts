@@ -1,12 +1,14 @@
 import {Construct} from 'constructs';
-import {EventBus} from 'aws-cdk-lib/aws-events';
+import {EventBus, IEventBus, Rule} from 'aws-cdk-lib/aws-events';
 import {Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {CfnPipe} from 'aws-cdk-lib/aws-pipes';
 import {FleaEventStore} from './event-store.construct';
+import {EventBus as EventBusTarget} from 'aws-cdk-lib/aws-events-targets';
 
 export interface FleaEventBusProps {
   domainName: string;
   eventStore: FleaEventStore;
+  publicEventBusName: string;
 }
 
 export class FleaEventBus extends Construct {
@@ -70,6 +72,23 @@ export class FleaEventBus extends Construct {
         },
       },
     });
+
+    const rule = new Rule(this, 'rule', {
+      eventPattern: {
+        source: ["com.sample"],
+        detail: {
+          meta: {
+            scope: ["public"],
+          }
+        }
+      },
+      eventBus: bus
+    });
+
+    const publicEventBus = EventBus.fromEventBusName(this, 'public-event-bus', props.publicEventBusName);
+
+    rule.addTarget(new EventBusTarget(publicEventBus, {
+    }));
 
     this.bus = bus;
   }
