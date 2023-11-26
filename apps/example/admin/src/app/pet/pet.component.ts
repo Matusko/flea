@@ -20,7 +20,7 @@ export class PetComponent {
   }
 
   private initPublicBusConn = (idToken: string) => {
-    const subject = webSocket(`wss://n7uzi66blj.execute-api.eu-central-1.amazonaws.com/prod/?idToken=${idToken}`);
+    const subject = webSocket(`wss://6rsqtnl7ni.execute-api.eu-central-1.amazonaws.com/prod/?idToken=${idToken}`);
 
     subject.subscribe({
       next: msg => console.log('message received: ' + JSON.stringify(msg)), // Called whenever there is a message from the server.

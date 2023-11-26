@@ -22,8 +22,8 @@ export class AuthService {
   constructor() {
     Amplify.configure({
       Auth: {
-        userPoolId: 'eu-central-1_fOVq9Z4Pd',
-        userPoolWebClientId: '1r445nstrv4cs5kceuc78rds2c',
+        userPoolId: 'eu-central-1_EqxFLWRC8',
+        userPoolWebClientId: '3i8a2rsqljtnejji37macgl56b',
         oauth: {
           domain: 'flea-example.auth.eu-central-1.amazoncognito.com',
           scope: ['openid', 'profile', 'email', 'aws.cognito.signin.user.admin'],
