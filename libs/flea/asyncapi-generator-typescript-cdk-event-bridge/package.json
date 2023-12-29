@@ -1,0 +1,7 @@
+{
+  "name": "@flea/flea/asyncapi-generator-typescript-cdk-event-bridge",
+  "version": "0.0.1",
+  "dependencies": {},
+  "type": "commonjs",
+  "main": "./index.cjs"
+}
