@@ -1,160 +1,65 @@
-asyncapi: "3.0.0"
+asyncapi: '2.6.0'
+tags:
+  -
+    name: pets
 info:
-  title: Smartylighting Streetlights public API
-  version: "1.0.0"
-  description: |
-    The Smartylighting Streetlights public API allows you to remotely manage the city lights through Kafka and WebSocket.
-
-    ### Check out its awesome features:
-
-    * Turn a specific streetlight on 🌃
-    * Receive real-time information about environmental lighting conditions 📈
+  title: Pets Domain
+  version: '1.0.0'
+  description: Example API for Flea
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
-
 servers:
-  kafka:
-    host: test.mykafkacluster.org:8092
-    protocol: kafka-secure
-    description: Test Kafka broker
-    security:
-      - $ref: '#/components/securitySchemes/saslScram'
-  websocket:
-    host: test.websocket.org:1999
-    protocol: ws
-    description: Test WebSocket server
-
+  local:
+    url: localhost:8000
+    protocol: aws event bridge
+    description: Local broker
 defaultContentType: application/json
-
 channels:
-  turnStreetlightOnChannel:
-    address: "/"
-    messages:
-      turnOn:
-        $ref: "#/components/messages/turnOn"
-    servers:
-      - $ref: "#/servers/websocket"
-
-  turnStreetlightOnReplyChannel:
-    address: "/"
-    messages:
-      turnOnReply:
-        $ref: "#/components/messages/turnOnReply"
-    servers:
-      - $ref: "#/servers/websocket"
-
-  lightMeasured:
-    description: The topic on which measured values may be produced and consumed.
-    address: "smartylighting.streetlights.1.0.event.{streetlightId}.lighting.measured"
-    parameters:
-      streetlightId:
-        $ref: "#/components/parameters/streetlightId"
-    messages:
-      lightMeasured:
-        $ref: "#/components/messages/lightMeasured"
-    servers:
-      - $ref: "#/servers/kafka"
-
-operations:
-  turnOn:
-    action: send
-    operationId: turnOn
-    channel:
-      $ref: "#/channels/turnStreetlightOnChannel"
-    reply:
-      channel:
-        $ref: "#/channels/turnStreetlightOnReplyChannel"
-
-  lightMeasured:
-    action: receive
-    summary: Inform about environmental lighting conditions of a particular streetlight.
-    operationId: receiveLightMeasurement
-    channel:
-      $ref: "#/channels/lightMeasured"
-    traits:
-      - $ref: "#/components/operationTraits/kafka"
-
+  pets.command.feed:
+    publish:
+      summary: Inform about environmental lighting conditions of a particular streetlight.
+      operationId: receiveLightMeasurement
+      message:
+        $ref: '#/components/messages/commandFeed'
+  pets.event.feedingOrdered:
+    subscribe:
+      operationId: turnOn
+      message:
+        $ref: '#/components/messages/eventFeedingOrdered'
 components:
   messages:
-    turnOn:
-      name: turnOn
-      title: Turn on
-      summary: Command a particular streetlight to turn the lights on.
-      payload:
-        $ref: "#/components/schemas/turnOnPayload"
-
-    turnOnReply:
-      name: turnOnReply
-      title: Turn on reply
-      summary: Reply from turning on the lights
-      payload:
-        $ref: "#/components/schemas/turnOnReplyPayload"
-
-    lightMeasured:
-      name: lightMeasured
-      title: Light measured
-      summary: Inform about environmental lighting conditions of a particular streetlight.
+    commandFeed:
+      name: 'command/feed'
+      title: Feed pet
       contentType: application/json
-      traits:
-        - $ref: "#/components/messageTraits/commonHeaders"
       payload:
-        $ref: "#/components/schemas/lightMeasuredPayload"
-
+        $ref: "#/components/schemas/commandFeed"
+    eventFeedingOrdered:
+      name: event/feedingOrdered
+      title: Turn on/off
+      payload:
+        $ref: "#/components/schemas/feedingOrdered"
   schemas:
-    turnOnPayload:
+    commandFeed:
       type: object
       properties:
-        streetlightId:
-          description: The ID of the streetlight.
+        petId:
           type: string
+          format: uuid
         sentAt:
-          type: string
-          format: date-time
-          description: Date and time when the request was sent
-
-    turnOnReplyPayload:
+          $ref: "#/components/schemas/sentAt"
+    feedingOrdered:
       type: object
       properties:
-        turnedOnTimestamp:
+        petId:
           type: string
-          format: date-time
-          description: Date and time when the light was actually turned on.
+          format: uuid
+        sentAt:
+          $ref: "#/components/schemas/sentAt"
+    sentAt:
+      type: string
+      format: date-time
+      description: Date and time when the message was sent.
 
-    lightMeasuredPayload:
-      schemaFormat: "application/vnd.apache.avro;version=1.9.0"
-      schema:
-        type: record
-        name: User
-        namespace: com.company
-        doc: User information
-        fields:
-          - name: lumens
-            type: int
-          - name: sentAt
-            type: timestamp_ms
 
-  securitySchemes:
-    saslScram:
-      type: scramSha256
-      description: Provide your username and password for SASL/SCRAM authentication
-
-  parameters:
-    streetlightId:
-      description: The ID of the streetlight.
-
-  messageTraits:
-    commonHeaders:
-      headers:
-        type: object
-        properties:
-          my-app-header:
-            type: integer
-            minimum: 0
-            maximum: 100
-
-  operationTraits:
-    kafka:
-      bindings:
-        kafka:
-          clientId: public

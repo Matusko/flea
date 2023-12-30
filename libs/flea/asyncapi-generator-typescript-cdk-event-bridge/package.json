@@ -1,7 +1,16 @@
 {
-  "name": "@flea/flea/asyncapi-generator-typescript-cdk-event-bridge",
+  "name": "asyncapi-generator-typescript-cdk-event-bridge",
   "version": "0.0.1",
   "dependencies": {},
   "type": "commonjs",
-  "main": "./index.cjs"
+  "main": "./template/index.js",
+  "generator": {
+    "renderer": "react",
+    "parameters": {
+      "server": {
+        "description": "The server you want to use in the code.",
+        "required": true
+      }
+    }
+  }
 }

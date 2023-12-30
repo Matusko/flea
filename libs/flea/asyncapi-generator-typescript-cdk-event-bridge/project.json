@@ -4,17 +4,28 @@
   "sourceRoot": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src",
   "projectType": "library",
   "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run flea-asyncapi-generator-typescript-cdk-event-bridge:build",
+          "mv libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/template/index.cjs libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/template/index.js",
+          "nx run flea-asyncapi-generator-typescript-cdk-event-bridge:asyncapi-generate"
+        ],
+        "parallel": false
+      }
+    },
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/libs/flea/asyncapi-generator-typescript-cdk-event-bridge",
-        "main": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/index.ts",
+        "outputPath": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist",
+        "outputFileName": "template/index.js",
+        "main": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/index.tsx",
         "tsConfig": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/tsconfig.lib.json",
         "assets": [
           "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/*.md"
         ],
-        "generatePackageJson": true,
         "format": ["cjs"]
       }
     },
@@ -35,10 +46,10 @@
         "jestConfig": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/jest.config.ts"
       }
     },
-    "generate": {
+    "asyncapi-generate": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "asyncapi generate fromTemplate libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-asyncapi.yaml libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src -p server=localhost -o gen-out\n"
+        "command": "asyncapi generate fromTemplate libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-asyncapi.yaml ./libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/ -p server=localhost -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out --force-write --param server=local\n"
       }
     }
   },
