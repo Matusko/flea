@@ -1,0 +1,92 @@
+asyncapi: 3.0.0
+info:
+  title: Hotel Domain
+  version: 1.0.0
+  description: Example API for Flea
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+  tags:
+    - name: hotel
+defaultContentType: application/json
+servers:
+  local:
+    host: 'localhost:8000'
+    protocol: aws event bridge
+    description: Local broker
+channels:
+  hotel.command:
+    address: hotel.command
+    messages:
+      commandAddHotelRoom.message:
+        $ref: '#/components/messages/commandAddHotelRoom'
+    x-flea:
+      channelType: commandHandler
+  hotel.event:
+    address: hotel.event
+    messages:
+      eventAddHotelRoomSubmitted.message:
+        $ref: '#/components/messages/eventAddHotelRoomSubmitted'
+    x-flea:
+      channelType: eventBus
+operations:
+  receiveCommandAddHotelRoom:
+    action: receive
+    channel:
+      $ref: '#/channels/hotel.command'
+    messages:
+      - $ref: '#/channels/hotel.command/messages/commandAddHotelRoom.message'
+  sendEventAddHotelRoomSubmitted:
+    action: send
+    channel:
+      $ref: '#/channels/hotel.event'
+    messages:
+      - $ref: '#/channels/hotel.event/messages/eventAddHotelRoomSubmitted.message'
+  receiveEventAddHotelRoomSubmitted:
+    action: receive
+    channel:
+      $ref: '#/channels/hotel.event'
+    messages:
+      - $ref: '#/channels/hotel.event/messages/eventAddHotelRoomSubmitted.message'
+  receiveEventHotelRoomPaymentProcessed:
+    action: send
+    channel:
+      $ref: 'libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-payment-asyncapi.yaml#/channels/payment.event'
+    messages:
+      - $ref: 'libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-payment-asyncapi.yaml#/channels/payment.event/messages/eventHotelRoomPaymentProcessed.message'
+components:
+  messages:
+    commandAddHotelRoom:
+      name: command/addHotelRoom
+      title: Add hotel Room
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/CommandAddHotelRoom'
+    eventAddHotelRoomSubmitted:
+      name: event/AddHotelRoomSubmitted
+      payload:
+        $ref: '#/components/schemas/EventAddHotelRoomSubmitted'
+  schemas:
+    CommandAddHotelRoom:
+      type: object
+      properties:
+        roomId:
+          type: string
+          format: uuid
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+    EventAddHotelRoomSubmitted:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+    sentAt:
+      type: string
+      format: date-time
+      description: Date and time when the message was sent.

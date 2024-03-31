@@ -1,0 +1,76 @@
+asyncapi: 3.0.0
+info:
+  title: Hotel Domain
+  version: 1.0.0
+  description: Example API for Flea
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+  tags:
+    - name: hotel
+defaultContentType: application/json
+servers:
+  local:
+    host: 'localhost:8000'
+    protocol: aws event bridge
+    description: Local broker
+channels:
+  payment.event:
+    address: payment.event
+    messages:
+      eventHotelRoomPaymentRequested.message:
+        $ref: '#/components/messages/eventHotelRoomPaymentRequested'
+      eventHotelRoomPaymentProcessed.message:
+        $ref: '#/components/messages/eventHotelRoomPaymentProcessed'
+    x-flea:
+      channelType: eventBus
+operations:
+  sendEventHotelRoomPaymentProcessed:
+    action: send
+    channel:
+      $ref: '#/channels/payment.event'
+    messages:
+      - $ref: '#/channels/hotel.event/messages/eventHotelRoomPaymentProcessed.message'
+  receiveEventHotelRoomPaymentRequested:
+    action: receive
+    channel:
+      $ref: '#/channels/payment.event'
+    messages:
+      - $ref: '#/channels/hotel.event/messages/eventHotelRoomPaymentRequested.message'
+components:
+  messages:
+    eventHotelRoomPaymentProcessed:
+      name: event/EventHotelRoomPaymentProcessed
+      payload:
+        $ref: '#/components/schemas/EventHotelRoomPaymentProcessed'
+    eventHotelRoomPaymentRequested:
+      name: event/EventHotelRoomPaymentRequested
+      payload:
+        $ref: '#/components/schemas/EventHotelRoomPaymentRequested'
+  schemas:
+    EventHotelRoomPaymentProcessed:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+    EventHotelRoomPaymentRequested:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        roomId:
+          type: string
+          format: uuid
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+    sentAt:
+      type: string
+      format: date-time
+      description: Date and time when the message was sent.

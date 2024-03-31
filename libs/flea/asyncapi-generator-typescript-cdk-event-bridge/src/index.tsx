@@ -1,15 +1,31 @@
-import { File } from '@asyncapi/generator-react-sdk'
+import { File } from '@asyncapi/generator-react-sdk';
+import {FleaFileEventBridgeRule} from './lib/flea-asyncapi-generator-typescript-cdk-event-bridge-rule';
+import { kebabCase } from 'change-case-all';
 
-export default function ({ asyncapi }) {
+export default async function ({asyncapi}) {
 
-  console.debug("Template asyncapi-generator-typescript-cdk-event-bridge");
-  console.debug(JSON.stringify(asyncapi, null, 4));
-  const kebabCase = string => string
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
+  console.debug("Template asyncapi-generator-typescript-cdk-event-bridge", asyncapi);
 
-  const fileName = `${kebabCase(asyncapi.info().title())}-event-bridge.construct.ts`;
+  const domainName = asyncapi.info().title();
+  const fileNameFleaFileEventBridgeRule = `${kebabCase(domainName)}-event-bridge-rule.construct.ts`;
 
-  return <File name={fileName}>{asyncapi.info().title()}</File>
+  return [
+      <File name={fileNameFleaFileEventBridgeRule}>
+        <FleaFileEventBridgeRule domainName={domainName} asyncapi={asyncapi}></FleaFileEventBridgeRule>
+      </File>,
+    ];
+  /*
+  const schemas = asyncapi.allSchemas();
+
+
+  return Array.from(schemas).map(([schemaName, schema]) => {
+    console.debug(schemaName, JSON.stringify(schema, null, 4));
+    const name = kebabCase(schemaName);
+    return (
+      <File name={`${name}.json`}>
+        {JSON.stringify(schema, null, 4)}
+      </File>
+    );
+  });*/
+
 }
