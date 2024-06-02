@@ -2,6 +2,8 @@
 import {Component} from '@angular/core';
 import {webSocket} from 'rxjs/webSocket';
 import {AuthService} from '../../auth/auth.service';
+import {Store} from '@ngrx/store';
+import {addPetCommand} from './pet.action';
 
 @Component({
   selector: 'pet',
@@ -9,14 +11,19 @@ import {AuthService} from '../../auth/auth.service';
 })
 export class PetComponent {
 
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private store: Store<{ pet: {list: any[]} }>
+  ) {
 
    // const socket$ = makeWebSocketObservable('wss://876ro4w8qd.execute-api.eu-central-1.amazonaws.com/prod/');
 
     this.authService.currentSession().then(user => this.initPublicBusConn(user.idToken.jwtToken));
 
+  }
 
-
+  addPet() {
+    this.store.dispatch(addPetCommand());
   }
 
   private initPublicBusConn = (idToken: string) => {
