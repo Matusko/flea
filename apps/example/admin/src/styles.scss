@@ -1,1 +1,32 @@
 /* You can add global styles to this file, and also import other style files */
+
+@use "@angular/material" as mat;
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@include mat.core();
+
+@import "styles/variables";
+@import "styles/layouts/transitions";
+@import "styles/helpers/color";
+@import "styles/helpers/icon-size";
+
+//Theme colors
+
+@import "styles/themecolors/default_theme";
+@include mat.all-component-themes($bluetheme);
+
+//container layout
+@import "styles/overrides/materialoverrides";
+@import "styles/container";
+@import "styles/layouts/layouts";
+@import "styles/grid/grid";
+@import "styles/helpers/custom-flex";
+@import "styles/helpers/index";
+
+
+// pages
+@import "styles/pages/dashboards";
+@import "styles/pages/auth";
+

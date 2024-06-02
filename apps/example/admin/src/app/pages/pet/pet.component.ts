@@ -1,7 +1,7 @@
 
 import {Component} from '@angular/core';
 import {webSocket} from 'rxjs/webSocket';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../../auth/auth.service';
 
 @Component({
   selector: 'pet',
