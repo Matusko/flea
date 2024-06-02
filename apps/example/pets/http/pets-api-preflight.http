@@ -1,0 +1,5 @@
+OPTIONS https://2vwuvdjmyj.execute-api.eu-central-1.amazonaws.com/prod/pets
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+

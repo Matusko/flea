@@ -32,6 +32,10 @@ export class FleaFoundation extends Construct {
       {
         key: 'rootResourceId',
         value: restAPiGW.rootResourceId
+      },
+      {
+        key: 'corsHandlerArn',
+        value: restAPiGW.corsHandlerArn
       }
     ]
 

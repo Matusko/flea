@@ -4,6 +4,8 @@ import {webSocket} from 'rxjs/webSocket';
 import {AuthService} from '../../auth/auth.service';
 import {Store} from '@ngrx/store';
 import {addPetCommand} from './pet.action';
+import {FormBuilder} from '@angular/forms';
+import {envConfig} from '../../../config/config';
 
 @Component({
   selector: 'pet',
@@ -13,7 +15,8 @@ export class PetComponent {
 
   constructor(
     private authService: AuthService,
-    private store: Store<{ pet: {list: any[]} }>
+    private store: Store<{ pet: {list: any[]} }>,
+    private fb: FormBuilder
   ) {
 
    // const socket$ = makeWebSocketObservable('wss://876ro4w8qd.execute-api.eu-central-1.amazonaws.com/prod/');
@@ -22,12 +25,17 @@ export class PetComponent {
 
   }
 
-  addPet() {
-    this.store.dispatch(addPetCommand());
+  petForm = this.fb.nonNullable.group({
+    name: [''],
+    type: [''],
+  });
+
+  addPetSubmit() {
+    this.store.dispatch(addPetCommand({payload: this.petForm.getRawValue()}));
   }
 
   private initPublicBusConn = (idToken: string) => {
-    const subject = webSocket(`wss://6rsqtnl7ni.execute-api.eu-central-1.amazonaws.com/prod/?idToken=${idToken}`);
+    const subject = webSocket(`wss://${envConfig.wssApiGWDomainName}/prod/?idToken=${idToken}`);
 
     subject.subscribe({
       next: msg => console.log('message received: ' + JSON.stringify(msg)), // Called whenever there is a message from the server.

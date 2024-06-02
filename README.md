@@ -62,3 +62,9 @@ Maker sure you have `node version >= v18.13.0`
 ```
  nx serve apps/example/admin
 ```
+
+## Deploy example-pets infra
+```
+ nx deploy example-pets
+```
+

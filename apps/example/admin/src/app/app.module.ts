@@ -17,6 +17,9 @@ import * as TablerIcons from 'angular-tabler-icons/icons';
 import {StoreModule} from '@ngrx/store';
 import {petReducer} from './pages/pet/pet.reducer';
 import {metaReducers} from './log/log.reducer';
+import {EffectsModule} from '@ngrx/effects';
+import {PetEffect} from './pages/pet/pet.effect';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   bootstrap: [AppComponent],
@@ -32,6 +35,8 @@ import {metaReducers} from './log/log.reducer';
     BrowserModule,
     RouterModule.forRoot(appRoutes, {initialNavigation: 'enabledBlocking'}),
     BrowserAnimationsModule,
+    EffectsModule.forRoot([PetEffect]),
+    HttpClientModule,
     MaterialModule,
     StoreModule.forRoot(
       {

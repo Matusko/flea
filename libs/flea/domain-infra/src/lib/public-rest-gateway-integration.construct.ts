@@ -1,7 +1,14 @@
 import {Construct} from 'constructs';
-import {AwsIntegration, CognitoUserPoolsAuthorizer, Deployment, IResource} from 'aws-cdk-lib/aws-apigateway';
+import {
+  AwsIntegration,
+  CognitoUserPoolsAuthorizer,
+  Deployment,
+  IResource,
+  LambdaIntegration
+} from 'aws-cdk-lib/aws-apigateway';
 import {Effect, Policy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {UserPool} from 'aws-cdk-lib/aws-cognito';
+import {IFunction} from 'aws-cdk-lib/aws-lambda';
 
 export interface FleaEventStorePublicGatewayIntegrationProps {
   parentResource: IResource;
@@ -12,6 +19,7 @@ export interface FleaEventStorePublicGatewayIntegrationProps {
     tableArn: string;
   },
   userPoolId: string;
+  corsHandler: IFunction;
 }
 
 export class FleaEventStorePublicGatewayIntegration extends Construct {
@@ -44,6 +52,11 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
               'application/json': `{
                 "requestId": "$context.requestId"
               }`,
+            },
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+              'method.response.header.Access-Control-Allow-Origin': "'http://localhost:4200'",
+              'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,PUT'",
             },
           },
         ],
@@ -83,6 +96,22 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
       methodResponses: [
         {
           statusCode: '202',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+
+        }
+      ]
+    });
+
+    const corsIntegration = new LambdaIntegration(props.corsHandler);
+
+    domainResource.addMethod('OPTIONS', corsIntegration, {
+      methodResponses: [
+        {
+          statusCode: '200',
 
         }
       ]

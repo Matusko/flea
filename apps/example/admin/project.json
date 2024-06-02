@@ -44,7 +44,13 @@
               "maximumError": "4kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "apps/example/admin/src/config/config.ts",
+              "with": "apps/example/admin/src/config/config.prod.ts"
+            }
+          ]
         },
         "development": {
           "buildOptimizer": false,
