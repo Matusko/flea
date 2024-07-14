@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import {addPetCommand, listPetsQuerySucc} from './pet.action';
+import {addPetCommand, addPetCommandSucc, listPetsQuerySucc} from './pet.action';
 import {Pet} from './types';
 
 export type PetState = {
@@ -31,7 +31,7 @@ export const initialState: PetState = {
 export const petReducer = createReducer(
   initialState,
   on(
-    addPetCommand, (state,  { payload }) => {
+    addPetCommandSucc, (state,  { payload }) => {
       return {
         list: [...state.list, payload],
         operations: state.operations

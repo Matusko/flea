@@ -46,7 +46,10 @@ export const handler = async (event) => {
               ],
               userId: event.detail.dynamodb.NewImage.userId.S
             },
-            data: item
+            data: {
+              payload: item,
+              type: 'pets/command-reply/addPetCommandSucc'
+            }
           }
         ),
         Source: 'com.sample',

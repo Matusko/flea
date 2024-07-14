@@ -6,10 +6,13 @@ import {PetRestClient} from './pet.rest-client';
 import {
   addPetCommand,
   addPetCommandRegisterErr,
-  addPetCommandRegisterSucc,
+  addPetCommandRegisterSucc, addPetCommandSucc, addPetCommandSuccActionName,
   listPetsQuery, listPetsQueryErr,
   listPetsQuerySucc
 } from './pet.action';
+import {PublicBusService} from '../../services/public-bus.service';
+import {Store} from '@ngrx/store';
+import {PetState} from './pet.reducer';
 
 @Injectable()
 export class PetEffect {
@@ -19,7 +22,7 @@ export class PetEffect {
       switchMap((action) =>
         this.petRestClient.listPets().pipe(
           map(data => listPetsQuerySucc({payload: data})),
-          catchError(error => of(listPetsQueryErr({ payload: error })))
+          catchError(error => of(listPetsQueryErr({payload: error})))
         )
       )
     ),
@@ -31,7 +34,7 @@ export class PetEffect {
       switchMap((action) =>
         this.petRestClient.putPet(action.payload).pipe(
           map(data => addPetCommandRegisterSucc()),
-          catchError(error => of(addPetCommandRegisterErr({ payload: error })))
+          catchError(error => of(addPetCommandRegisterErr({payload: error})))
         )
       )
     ),
@@ -39,6 +42,25 @@ export class PetEffect {
 
   constructor(
     private actions: Actions,
-    private petRestClient: PetRestClient
-  ) {}
+    private petRestClient: PetRestClient,
+    private publicBusService: PublicBusService,
+    private store: Store<{ pet: PetState }>,
+  ) {
+    publicBusService.msgSubject.subscribe(msg => {
+      this.mapMSGToAction(msg)
+    })
+  }
+
+  private mapMSGToAction = (msg: any) => {
+
+    if (msg) {
+      switch (msg.type) {
+        case addPetCommandSuccActionName:
+          this.store.dispatch(addPetCommandSucc({ payload: msg.payload }));
+          break;
+        default:
+          break;
+      }
+    }
+  }
 }

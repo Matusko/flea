@@ -20,6 +20,7 @@ import {metaReducers} from './log/log.reducer';
 import {EffectsModule} from '@ngrx/effects';
 import {PetEffect} from './pages/pet/pet.effect';
 import {HttpClientModule} from '@angular/common/http';
+import {PublicBusService} from './services/public-bus.service';
 
 @NgModule({
   bootstrap: [AppComponent],
@@ -46,6 +47,8 @@ import {HttpClientModule} from '@angular/common/http';
       }),
     TablerIconsModule.pick(TablerIcons),
   ],
-  providers: [],
+  providers: [
+    PublicBusService
+  ],
 })
 export class AppModule {}
