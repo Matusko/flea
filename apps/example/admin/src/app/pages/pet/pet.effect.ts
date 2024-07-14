@@ -32,7 +32,7 @@ export class PetEffect {
     this.actions.pipe(
       ofType(addPetCommand),
       switchMap((action) =>
-        this.petRestClient.putPet(action.payload).pipe(
+        this.petRestClient.putPet(action).pipe(
           map(data => addPetCommandRegisterSucc()),
           catchError(error => of(addPetCommandRegisterErr({payload: error})))
         )

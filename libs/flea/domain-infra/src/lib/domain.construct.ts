@@ -10,6 +10,8 @@ import {
 } from './read-model.construct';
 import {NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {Fn} from 'aws-cdk-lib';
+import {ITable} from 'aws-cdk-lib/aws-dynamodb';
+import {FleaCommandHandler, FleaCommandHandlerProps} from './command-handler.construct';
 
 export interface FleaDomainProps {
   name: string;
@@ -18,6 +20,7 @@ export interface FleaDomainProps {
   readModelTableName: string;
   eventListenerProps: NodejsFunctionProps;
   queryHandlerProps: NodejsFunctionProps;
+  commandHandlerProps: NodejsFunctionProps;
   readModelPublicBusIntegrationProps: ReadModelPublicBusIntegrationBaseProps;
 }
 
@@ -33,7 +36,13 @@ export class FleaDomain extends Construct {
     const publicEventBusName = Fn.importValue(`${props.foundationName}-publicEventBusName`);
 
     const eventStore = new FleaEventStore(this, 'event-store', {
-      domainName: props.name
+      domainName: props.name,
+    });
+
+    const commandHandler = new FleaCommandHandler(this, 'command-handler', {
+      domainName: props.name,
+      commandHandlerProps: props.commandHandlerProps,
+      eventStoreTable: eventStore.table
     });
 
     const eventBus = new FleaEventBus(this, 'domain-event-bus', {
@@ -72,7 +81,8 @@ export class FleaDomain extends Construct {
       },
       userPoolId,
       corsHandler,
-      queryHandler: readModel.queryHandler
+      queryHandler: readModel.queryHandler,
+      commandHandler: commandHandler.function
     });
 
   }

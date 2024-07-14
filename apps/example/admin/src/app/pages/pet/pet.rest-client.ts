@@ -13,9 +13,9 @@ export class PetRestClient {
     private authService: AuthService,
   ) {}
 
-  putPet = (pet: Pet) => {
+  putPet = (item: {type: string, payload: Pet}) => {
     return from(this.authService.currentSession()).pipe(
-      mergeMap(user => this.http.put(`https://${envConfig.restApiGWDomainName}/prod/pets`, pet,{
+      mergeMap(user => this.http.put(`https://${envConfig.restApiGWDomainName}/prod/pets`, item,{
         headers: {
           'Authorization': `Bearer ${user.idToken.jwtToken}`
         }

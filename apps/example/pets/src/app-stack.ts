@@ -19,6 +19,10 @@ export class AppStack extends Stack {
         functionName: 'pets-query-handler',
         entry: path.join(__dirname, 'lambda/query-handler/index.ts'),
       },
+      commandHandlerProps: {
+        functionName: 'pets-command-handler',
+        entry: path.join(__dirname, 'lambda/command-handler/index.ts'),
+      },
       readModelPublicBusIntegrationProps: {
         region: props.env.region,
         account: props.env.account,

@@ -21,6 +21,7 @@ export interface FleaEventStorePublicGatewayIntegrationProps {
   userPoolId: string;
   corsHandler: IFunction;
   queryHandler: IFunction;
+  commandHandler: IFunction;
 }
 
 export class FleaEventStorePublicGatewayIntegration extends Construct {
@@ -46,7 +47,7 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
     });
     putEventRole.attachInlinePolicy(putEventPolicy);
-
+/*
     const putEventIntegration = new AwsIntegration({
       action: 'PutItem',
       options: {
@@ -87,7 +88,38 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
         },
       },
       service: 'dynamodb',
-    });
+    });*/
+
+    const putEventIntegration = new LambdaIntegration(props.commandHandler,{
+        proxy: false,
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+        integrationResponses: [
+          {
+            statusCode: '202',
+            responseTemplates: {
+              'application/json': `{
+                "requestId": "$context.requestId"
+              }`,
+            },
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+              'method.response.header.Access-Control-Allow-Origin': "'http://localhost:4200'",
+              'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,PUT'",
+            },
+          },
+        ],
+      requestTemplates: {
+        'application/json': `{
+                "id": "$context.requestId",
+                "time": "$context.requestTime",
+                "timeEpoch": $context.requestTimeEpoch,
+                "userId": "$context.authorizer.claims.sub",
+                "type": "$input.path('$.type')",
+                "payload": $input.json('$.payload')
+            }`,
+       },
+      }
+    );
 
     const domainResource = props.parentResource.addResource(props.domainResourcePath);
 

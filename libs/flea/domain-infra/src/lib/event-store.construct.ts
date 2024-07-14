@@ -17,8 +17,11 @@ export class FleaEventStore extends Construct {
       partitionKey: {
         name: 'id',
         type: AttributeType.STRING,
-
       },
+      sortKey: {
+        name: 'timeEpoch',
+        type: AttributeType.NUMBER
+      }
     });
 
   }

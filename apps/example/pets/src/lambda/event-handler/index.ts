@@ -21,9 +21,9 @@ export const handler = async (event) => {
   }
 
   const item = {
-    id: event.detail.dynamodb.NewImage.id ? event.detail.dynamodb.NewImage.id.S : uuidv4(),
-    name: event.detail.dynamodb.NewImage.name.S,
-    type: event.detail.dynamodb.NewImage.type.S
+    id: event.detail.dynamodb.NewImage.payload.M.id ? event.detail.dynamodb.NewImage.payload.M.id.S : uuidv4(),
+    name: event.detail.dynamodb.NewImage.payload.M.name.S,
+    type: event.detail.dynamodb.NewImage.payload.M.type.S
   }
 
   console.log(`item: ${JSON.stringify(item)}`);
@@ -48,7 +48,7 @@ export const handler = async (event) => {
             },
             data: {
               payload: item,
-              type: 'pets/command-reply/addPetCommandSucc'
+              type: 'pets/command-reply/addPetCommandSucc' // TODO command reply? or event?
             }
           }
         ),
