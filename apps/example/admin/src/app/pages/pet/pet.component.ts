@@ -3,19 +3,26 @@ import {Component} from '@angular/core';
 import {webSocket} from 'rxjs/webSocket';
 import {AuthService} from '../../auth/auth.service';
 import {Store} from '@ngrx/store';
-import {addPetCommand} from './pet.action';
+import {addPetCommand, listPetsQuery} from './pet.action';
 import {FormBuilder} from '@angular/forms';
 import {envConfig} from '../../../config/config';
+import {selectPetList} from './pet.selector';
+import {PetState} from './pet.reducer';
 
 @Component({
   selector: 'pet',
   templateUrl: './pet.component.html',
 })
 export class PetComponent {
+  readonly pets = this.store.selectSignal(selectPetList);
+
+  ngOnInit() {
+    this.store.dispatch(listPetsQuery());
+  }
 
   constructor(
     private authService: AuthService,
-    private store: Store<{ pet: {list: any[]} }>,
+    private store: Store<{ pet: PetState }>,
     private fb: FormBuilder
   ) {
 

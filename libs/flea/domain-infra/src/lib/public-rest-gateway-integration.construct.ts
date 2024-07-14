@@ -4,7 +4,7 @@ import {
   CognitoUserPoolsAuthorizer,
   Deployment,
   IResource,
-  LambdaIntegration
+  LambdaIntegration, PassthroughBehavior
 } from 'aws-cdk-lib/aws-apigateway';
 import {Effect, Policy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {UserPool} from 'aws-cdk-lib/aws-cognito';
@@ -20,11 +20,17 @@ export interface FleaEventStorePublicGatewayIntegrationProps {
   },
   userPoolId: string;
   corsHandler: IFunction;
+  queryHandler: IFunction;
 }
 
 export class FleaEventStorePublicGatewayIntegration extends Construct {
   constructor(scope: Construct, id: string, props: FleaEventStorePublicGatewayIntegrationProps) {
     super(scope, id);
+
+    const userPool = UserPool.fromUserPoolId(this, 'user-pool', props.userPoolId);
+    const authorizer = new CognitoUserPoolsAuthorizer(this, 'public-rest-gateway-authorizer', {
+      cognitoUserPools: [userPool]
+    });
 
     const putEventPolicy = new Policy(this, 'putEventPolicy', {
       statements: [
@@ -85,17 +91,41 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
 
     const domainResource = props.parentResource.addResource(props.domainResourcePath);
 
-    const userPool = UserPool.fromUserPoolId(this, 'user-pool', props.userPoolId);
-
-    const authorizer = new CognitoUserPoolsAuthorizer(this, 'public-rest-gateway-authorizer', {
-      cognitoUserPools: [userPool]
-    });
-
     domainResource.addMethod('PUT', putEventIntegration, {
       authorizer,
       methodResponses: [
         {
           statusCode: '202',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+
+        }
+      ]
+    });
+
+    const queryHandlerIntegration = new LambdaIntegration(props.queryHandler,{
+        proxy: false,
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
+        integrationResponses: [
+          {
+            statusCode: "200",
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Headers': "'Content-Type,Authorization'",
+              'method.response.header.Access-Control-Allow-Origin': "'http://localhost:4200'",
+              'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET'",
+            },
+          },
+        ],
+      }
+    );
+
+    domainResource.addMethod('GET', queryHandlerIntegration, {
+      methodResponses: [
+        {
+          statusCode: '200',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Headers': true,
             'method.response.header.Access-Control-Allow-Methods': true,
@@ -116,6 +146,8 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
         }
       ]
     });
+
+
     const dateStr = new Date().toDateString();
     const deployment = new Deployment(this, 'public-rest-gateway-deployment', {
       api: props.parentResource.api,

@@ -14,3 +14,17 @@ export const addPetCommandRegisterErr = createAction(
   'pets/command-reply/addPetCommandRegisterErr',
   props<{ payload: any}>()
 );
+
+export const listPetsQuery = createAction(
+  'pets/query/listPets'
+);
+
+export const listPetsQuerySucc = createAction(
+  'pets/query-reply/listPetsQuerySucc',
+  props<{ payload: any}>()
+);
+
+export const listPetsQueryErr = createAction(
+  'pets/query-reply/listPetsQueryErr',
+  props<{ payload: any}>()
+);

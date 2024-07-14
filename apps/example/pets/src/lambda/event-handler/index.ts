@@ -1,8 +1,15 @@
+import { v4 as uuidv4 } from 'uuid';
 import {EventBridgeClient, PutEventsCommand} from '@aws-sdk/client-eventbridge';
+import {DynamoDBClient} from '@aws-sdk/client-dynamodb';
+import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb"
 
 const eventBusArn = process.env.EVENT_BUS_ARN!;
+const tableName = process.env.READ_MODEL_TABLE_NAME!;
 
-const client = new EventBridgeClient({});
+const eventBridgeClient = new EventBridgeClient({});
+
+const dynamoDBClient = new DynamoDBClient({});
+const dynamoDBDocumentClient = DynamoDBDocumentClient.from(dynamoDBClient);
 
 export const handler = async (event) => {
   console.log(JSON.stringify(event));
@@ -12,6 +19,21 @@ export const handler = async (event) => {
       "status": "ok yeah"
     }
   }
+
+  const item = {
+    id: event.detail.dynamodb.NewImage.id ? event.detail.dynamodb.NewImage.id.S : uuidv4(),
+    name: event.detail.dynamodb.NewImage.name.S,
+    type: event.detail.dynamodb.NewImage.type.S
+  }
+
+  console.log(`item: ${JSON.stringify(item)}`);
+
+  const command = new PutCommand({
+    TableName: tableName,
+    Item: item
+  });
+
+  await dynamoDBDocumentClient.send(command);
 
   const putEvent = {
     Entries: [
@@ -24,10 +46,7 @@ export const handler = async (event) => {
               ],
               userId: event.detail.dynamodb.NewImage.userId.S
             },
-            data: {
-              name: event.detail.dynamodb.NewImage.name.S,
-              type: event.detail.dynamodb.NewImage.type.S
-            }
+            data: item
           }
         ),
         Source: 'com.sample',
@@ -39,7 +58,7 @@ export const handler = async (event) => {
 
   console.log(`Send event: ${JSON.stringify(putEvent)}`);
 
-  const response = await client.send(
+  const response = await eventBridgeClient.send(
     new PutEventsCommand(putEvent),
   );
 

@@ -22,4 +22,14 @@ export class PetRestClient {
       }))
     )
   };
+
+  listPets = () => {
+    return from(this.authService.currentSession()).pipe(
+      mergeMap(user => this.http.get(`https://${envConfig.restApiGWDomainName}/prod/pets`,{
+        headers: {
+          'Authorization': `Bearer ${user.idToken.jwtToken}`
+        }
+      }))
+    )
+  };
 }

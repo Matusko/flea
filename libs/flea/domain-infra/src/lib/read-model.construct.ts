@@ -3,7 +3,8 @@ import {AttributeType, Table} from 'aws-cdk-lib/aws-dynamodb';
 import {NodejsFunction, NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
 import {IEventBus, Rule} from 'aws-cdk-lib/aws-events';
-import {Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
+import {Effect, Policy, PolicyStatement} from 'aws-cdk-lib/aws-iam';
+import {IFunction} from 'aws-cdk-lib/aws-lambda';
 
 export interface ReadModelPublicBusIntegrationBaseProps {
   stage: string;
@@ -19,11 +20,13 @@ export interface FleaReadModelProps {
   eventBus: IEventBus;
   tableName: string;
   eventListenerProps: NodejsFunctionProps;
+  queryHandlerProps: NodejsFunctionProps;
   publicBus: ReadModelPublicBusIntegrationProps;
 }
 
 export class FleaReadModel extends Construct {
   table: Table;
+  queryHandler: IFunction;
 
   constructor(scope: Construct, id: string, props: FleaReadModelProps) {
     super(scope, id);
@@ -36,18 +39,26 @@ export class FleaReadModel extends Construct {
       },
     });
 
-    const fn = new NodejsFunction(this, 'event-listener', {
+    const fnEventListener = new NodejsFunction(this, 'event-listener', {
       ...props.eventListenerProps,
       environment: {
-        EVENT_BUS_ARN: props.eventBus.eventBusArn
+        EVENT_BUS_ARN: props.eventBus.eventBusArn,
+        READ_MODEL_TABLE_NAME: this.table.tableName
       }
     });
 
-    fn.addToRolePolicy(new PolicyStatement({
+    fnEventListener.addToRolePolicy(new PolicyStatement({
       resources: [props.eventBus.eventBusArn],
       actions: ['events:PutEvents'],
       effect: Effect.ALLOW,
     }));
+
+    fnEventListener.addToRolePolicy(new PolicyStatement({
+      resources: [ this.table.tableArn],
+      actions: ['dynamodb:PutItem'],
+      effect: Effect.ALLOW,
+    }));
+
 
     const rule = new Rule(this, 'rule', {
       eventPattern: {
@@ -56,8 +67,26 @@ export class FleaReadModel extends Construct {
       eventBus: props.eventBus
     });
 
-    rule.addTarget(new LambdaFunction(fn, {
+    rule.addTarget(new LambdaFunction(fnEventListener, {
     }));
+
+    const fnQueryHandler = new NodejsFunction(this, 'query-handler', {
+      ...props.queryHandlerProps,
+      environment: {
+        READ_MODEL_TABLE_NAME: this.table.tableName
+      }
+    });
+
+    fnQueryHandler.addToRolePolicy(new PolicyStatement({
+      resources: [ this.table.tableArn],
+      actions: [
+        'dynamodb:Query',
+        'dynamodb:Scan'
+      ],
+      effect: Effect.ALLOW,
+    }));
+
+    this.queryHandler = fnQueryHandler;
 
   }
 }

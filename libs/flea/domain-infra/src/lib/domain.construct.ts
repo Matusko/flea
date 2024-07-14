@@ -17,6 +17,7 @@ export interface FleaDomainProps {
   domainResourcePath: string;
   readModelTableName: string;
   eventListenerProps: NodejsFunctionProps;
+  queryHandlerProps: NodejsFunctionProps;
   readModelPublicBusIntegrationProps: ReadModelPublicBusIntegrationBaseProps;
 }
 
@@ -50,6 +51,17 @@ export class FleaDomain extends Construct {
 
     const corsHandler = Function.fromFunctionArn(this, 'cors-handler', corsHandlerArn);
 
+    const readModel = new FleaReadModel(this, 'read-model', {
+      tableName: props.readModelTableName,
+      eventListenerProps: props.eventListenerProps,
+      queryHandlerProps: props.queryHandlerProps,
+      eventBus: eventBus.bus,
+      publicBus: {
+        ...props.readModelPublicBusIntegrationProps,
+        webSocketApiId
+      },
+    });
+
     new FleaEventStorePublicGatewayIntegration(this, 'event-store-integration', {
       parentResource: rootResource,
       domainResourcePath: props.domainResourcePath,
@@ -59,17 +71,8 @@ export class FleaDomain extends Construct {
         tableArn: eventStore.table.tableArn
       },
       userPoolId,
-      corsHandler
-    });
-
-    new FleaReadModel(this, 'read-model', {
-      tableName: props.readModelTableName,
-      eventListenerProps: props.eventListenerProps,
-      eventBus: eventBus.bus,
-      publicBus: {
-        ...props.readModelPublicBusIntegrationProps,
-        webSocketApiId
-      },
+      corsHandler,
+      queryHandler: readModel.queryHandler
     });
 
   }

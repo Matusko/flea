@@ -13,3 +13,6 @@
 
   <button mat-button color="accent" type="submit">Submit</button>
 </form>
+<mat-list>
+  <mat-list-item  *ngFor="let pet of pets()">{{ pet.name }} is {{ pet.type }}</mat-list-item>
+</mat-list>

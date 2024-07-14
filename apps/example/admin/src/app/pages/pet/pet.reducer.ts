@@ -1,11 +1,15 @@
 import { createReducer, on } from '@ngrx/store';
-import { addPetCommand } from './pet.action';
+import {addPetCommand, listPetsQuerySucc} from './pet.action';
 import {Pet} from './types';
 
 export type PetState = {
   list: Pet[];
   operations: {
     add: {
+      loading: boolean;
+      error?: any;
+    },
+    list: {
       loading: boolean;
       error?: any;
     }
@@ -17,6 +21,9 @@ export const initialState: PetState = {
   operations: {
     add: {
       loading: false,
+    },
+    list: {
+      loading: false,
     }
   }
 };
@@ -24,11 +31,19 @@ export const initialState: PetState = {
 export const petReducer = createReducer(
   initialState,
   on(
-    addPetCommand, (state) => {
+    addPetCommand, (state,  { payload }) => {
       return {
-        list: [...state.list, {name: 'aaaa', type: 'bbbb'}],
+        list: [...state.list, payload],
         operations: state.operations
       }
-    }
+    },
+  ),
+  on(
+    listPetsQuerySucc, (state, { payload }) => {
+      return {
+        list: payload,
+        operations: state.operations
+      }
+    },
   )
 );
