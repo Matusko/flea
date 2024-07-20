@@ -83,16 +83,22 @@ components:
           type: object
           additionalProperties: false
           required:
-            - eventId
+            - data
+            - dataformat
           properties:
-            eventId:
-              type: string
-              format: uuid
-            roomId:
-              type: string
-              format: uuid
-            sentAt:
-              $ref: '#/components/schemas/sentAt'
+            dataFormat:
+              $ref: '#/components/schemas/dataFormat'
+            data:
+              $ref: '#/components/schemas/Room'
+    Room:
+      type: object
+      additionalProperties: false
+      required:
+        - roomId
+      properties:
+        roomId:
+          type: string
+          format: uuid
     EventEnvelope:
       additionalProperties: false
       type: object
@@ -117,24 +123,35 @@ components:
       additionalProperties: false
       type: object
       required:
-        - source
-        - specversion
+        - domain
+        - lifeCycle
+        - specVersion
       properties:
-        source:
+        domain:
+          $ref: '#/components/schemas/domain'
+        specVersion:
           type: string
-        specversion:
-          type: string
-        subject:
-          $ref: '#/components/schemas/subject'
         userId:
           $ref: '#/components/schemas/userId'
         tenantId:
           $ref: '#/components/schemas/tenantId'
-        eventLifeCycle:
+        lifeCycle:
           $ref: '#/components/schemas/eventLifeCycle'
+    domain:
+      additionalProperties: false
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        subject:
+          $ref: '#/components/schemas/subject'
     subject:
       additionalProperties: false
       type: object
+      required:
+        - entity
       properties:
         id:
           type: string
@@ -146,15 +163,24 @@ components:
       additionalProperties: false
       type: object
       required:
+        - source
+        - origination
         - correlationId
         - chain
+        - isReplayed
       properties:
+        source:
+          type: string
+        origination:
+          $ref: '#/components/schemas/origination'
         correlationId:
           $ref: '#/components/schemas/correlationId'
         chain:
           type: array
           items:
             $ref: '#/components/schemas/eventLifeCycleChainItem'
+        isReplayed:
+          type: boolean
     eventLifeCycleChainItem:
       additionalProperties: false
       type: object
@@ -187,3 +213,20 @@ components:
       enum:
         - domain
         - integration
+    origination:
+      type: string
+      enum:
+        - systemInvoked
+        - registeredCommand
+        - dataChanged
+    dataFormat:
+      additionalProperties: false
+      type: object
+      required:
+        - contentType
+        - schema
+      properties:
+        contentType:
+          type: string
+        schema:
+          type: string

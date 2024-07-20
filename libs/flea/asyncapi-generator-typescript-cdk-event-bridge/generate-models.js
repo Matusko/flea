@@ -5,7 +5,6 @@ fs.readFile(__dirname + '/src/lib/test-fixtures/test-hotel-asyncapi.yaml', (err,
   if (err) throw err;
   const models = generator.generate(inputD.toString()).then(outputModels => {
     console.log('outputModels: ', JSON.stringify(outputModels, null, 4));
-    fs.writeFileSync(__dirname + `/gen.out/models/models.json`, JSON.stringify(outputModels, null, 4));
    // outputModels.forEach(outputModel => writeModel(outputModel));
     writeModels(
       outputModels.map(outputModel => editFileContent(outputModel.result))
