@@ -68,6 +68,7 @@ components:
         $ref: '#/components/schemas/EventAddHotelRoomSubmitted'
   schemas:
     CommandAddHotelRoom:
+      additionalProperties: false
       type: object
       properties:
         roomId:
@@ -76,19 +77,113 @@ components:
         sentAt:
           $ref: '#/components/schemas/sentAt'
     EventAddHotelRoomSubmitted:
+      allOf:
+        - $ref: '#/components/schemas/EventEnvelope'
+        -
+          type: object
+          additionalProperties: false
+          required:
+            - eventId
+          properties:
+            eventId:
+              type: string
+              format: uuid
+            roomId:
+              type: string
+              format: uuid
+            sentAt:
+              $ref: '#/components/schemas/sentAt'
+    EventEnvelope:
+      additionalProperties: false
+      type: object
+      required:
+        - id
+        - sentAt
+        - type
+        - meta
+        - scope
+      properties:
+        id:
+          $ref: '#/components/schemas/eventId'
+        sentAt:
+          $ref: '#/components/schemas/sentAt'
+        type:
+          type: string
+        meta:
+          $ref: '#/components/schemas/EventEnvelopeMeta'
+        scope:
+          $ref: '#/components/schemas/scope'
+    EventEnvelopeMeta:
+      additionalProperties: false
+      type: object
+      required:
+        - source
+        - specversion
+      properties:
+        source:
+          type: string
+        specversion:
+          type: string
+        subject:
+          $ref: '#/components/schemas/subject'
+        userId:
+          $ref: '#/components/schemas/userId'
+        tenantId:
+          $ref: '#/components/schemas/tenantId'
+        eventLifeCycle:
+          $ref: '#/components/schemas/eventLifeCycle'
+    subject:
+      additionalProperties: false
+      type: object
+      properties:
+        id:
+          type: string
+        entity:
+          type: string
+        revision:
+          type: string
+    eventLifeCycle:
+      additionalProperties: false
+      type: object
+      required:
+        - correlationId
+        - chain
+      properties:
+        correlationId:
+          $ref: '#/components/schemas/correlationId'
+        chain:
+          type: array
+          items:
+            $ref: '#/components/schemas/eventLifeCycleChainItem'
+    eventLifeCycleChainItem:
+      additionalProperties: false
       type: object
       required:
         - eventId
+        - sentAt
       properties:
         eventId:
-          type: string
-          format: uuid
-        roomId:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/eventId'
         sentAt:
           $ref: '#/components/schemas/sentAt'
+    eventId:
+      type: string
+      format: uuid
+    correlationId:
+      type: string
+      format: uuid
     sentAt:
       type: string
       format: date-time
       description: Date and time when the message was sent.
+    userId:
+      type: string
+      format: uuid
+    tenantId:
+      type: string
+      format: uuid
+    scope:
+      type: string
+      enum:
+        - domain
+        - integration
