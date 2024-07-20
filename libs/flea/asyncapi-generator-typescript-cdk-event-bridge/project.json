@@ -4,11 +4,11 @@
   "sourceRoot": "libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src",
   "projectType": "library",
   "targets": {
-    "generate": {
+    "gen": {
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "rm -f libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out/*",
+          "rm -f libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out/bus/*",
           "nx run flea-asyncapi-generator-typescript-cdk-event-bridge:build",
           "mv libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/template/index.cjs libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/template/index.js",
           "nx run flea-asyncapi-generator-typescript-cdk-event-bridge:asyncapi-generate"
@@ -50,13 +50,24 @@
     "asyncapi-generate": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "asyncapi generate fromTemplate libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml ./libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/ -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out --force-write --param server=local\n"
+        "command": "asyncapi generate fromTemplate libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml ./libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/ -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out/bus --force-write --param server=local\n"
       }
     },
     "asyncapi-generate-models": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "asyncapi generate models typescript libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out\n"
+        "command": "asyncapi generate models typescript libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out/bus\n"
+      }
+    },
+    "asyncapi-modelina-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "rm -rf {projectRoot}/gen.out/models",
+          "mkdir {projectRoot}/gen.out/models",
+          "node {projectRoot}/generate-models.js\n"
+        ],
+        "parallel": false
       }
     },
     "asyncapi-validate": {

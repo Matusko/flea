@@ -68,3 +68,13 @@ Maker sure you have `node version >= v18.13.0`
  nx deploy example-pets
 ```
 
+## Asyncapi-generator
+## Rebuild and run eventbridge generator
+```
+nx gen flea-asyncapi-generator-typescript-cdk-event-bridge 
+```
+
+## Generate typescript interfaces
+```
+ nx asyncapi-modelina-generate flea-asyncapi-generator-typescript-cdk-event-bridge 
+```

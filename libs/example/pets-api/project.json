@@ -20,6 +20,12 @@
         "command": "asyncapi generate fromTemplate https://raw.githubusercontent.com/asyncapi/generator/v1.4.0/test/docs/ws.yml @asyncapi/nodejs-ws-template -p server=localhost -o gen-out\n"
       }
     },
+    "generate-models": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "asyncapi generate fromTemplate https://raw.githubusercontent.com/asyncapi/generator/v1.4.0/test/docs/ws.yml @asyncapi/nodejs-ws-template -p server=localhost -o gen-out\n"
+      }
+    },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],

@@ -77,6 +77,8 @@ components:
           $ref: '#/components/schemas/sentAt'
     EventAddHotelRoomSubmitted:
       type: object
+      required:
+        - eventId
       properties:
         eventId:
           type: string
