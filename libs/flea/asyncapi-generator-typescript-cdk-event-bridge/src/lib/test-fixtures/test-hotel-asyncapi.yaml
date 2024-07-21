@@ -22,6 +22,15 @@ channels:
         $ref: '#/components/messages/commandAddHotelRoom'
     x-flea:
       channelType: commandHandler
+  hotel.query:
+    address: hotel.query
+    messages:
+      queryHotelRoomList.message:
+        $ref: '#/components/messages/queryHotelRoomList'
+      queryReplyHotelRoomList.message:
+        $ref: '#/components/messages/queryReplyHotelRoomList'
+    x-flea:
+      channelType: queryHandler
   hotel.event:
     address: hotel.event
     messages:
@@ -36,6 +45,21 @@ operations:
       $ref: '#/channels/hotel.command'
     messages:
       - $ref: '#/channels/hotel.command/messages/commandAddHotelRoom.message'
+  receiveQueryHotelRoomList:
+    action: receive
+    channel:
+      $ref: '#/channels/hotel.query'
+    messages:
+      - $ref: '#/channels/hotel.query/messages/queryHotelRoomList.message'
+    reply:
+      channel:
+        $ref: '#/channels/hotel.query'
+      messages:
+        - $ref: '#/channels/hotel.query/messages/queryReplyHotelRoomList.message'
+    bindings:
+      http:
+        method: GET
+        bindingVersion: '0.3.0'
   sendEventAddHotelRoomSubmitted:
     action: send
     channel:
@@ -62,10 +86,39 @@ components:
       contentType: application/json
       payload:
         $ref: '#/components/schemas/CommandAddHotelRoom'
+    queryHotelRoomList:
+      name: query/hotelRoomList
+      title: Query hotel room list
+      contentType: application/json
+      bindings:
+        http:
+          headers:
+            type: object
+            properties:
+              Content-Type:
+                type: string
+                enum: [ 'application/json' ]
+          bindingVersion: '0.3.0'
+    queryReplyHotelRoomList:
+      name: query-reply/hotelRoomList
+      title: Reply to Query hotel room list
+      contentType: application/json
+      bindings:
+        http:
+          statusCode: 200
+          headers:
+            type: object
+            properties:
+              Content-Type:
+                type: string
+                enum: [ 'application/json' ]
+          bindingVersion: '0.3.0'
+      payload:
+        $ref: '#/components/schemas/EventAddHotelRoomSubmitted'
     eventAddHotelRoomSubmitted:
       name: event/AddHotelRoomSubmitted
       payload:
-        $ref: '#/components/schemas/EventAddHotelRoomSubmitted'
+        $ref: '#/components/schemas/QueryReplyHotelRoomList'
   schemas:
     CommandAddHotelRoom:
       additionalProperties: false
@@ -75,7 +128,16 @@ components:
           type: string
           format: uuid
         sentAt:
-          $ref: '#/components/schemas/sentAt'
+          $ref: '#/components/schemas/SentAt'
+    QueryReplyHotelRoomList:
+      additionalProperties: false
+      type: array
+      items:
+        type: object
+        properties:
+          roomId:
+            type: string
+            format: uuid
     EventAddHotelRoomSubmitted:
       allOf:
         - $ref: '#/components/schemas/EventEnvelope'
@@ -87,7 +149,7 @@ components:
             - dataformat
           properties:
             dataFormat:
-              $ref: '#/components/schemas/dataFormat'
+              $ref: '#/components/schemas/DataFormat'
             data:
               $ref: '#/components/schemas/Room'
     Room:
@@ -110,15 +172,15 @@ components:
         - scope
       properties:
         id:
-          $ref: '#/components/schemas/eventId'
+          $ref: '#/components/schemas/EventId'
         sentAt:
-          $ref: '#/components/schemas/sentAt'
+          $ref: '#/components/schemas/SentAt'
         eventType:
           type: string
         meta:
           $ref: '#/components/schemas/EventEnvelopeMeta'
         scope:
-          $ref: '#/components/schemas/scope'
+          $ref: '#/components/schemas/Scope'
     EventEnvelopeMeta:
       additionalProperties: false
       type: object
@@ -128,16 +190,16 @@ components:
         - specVersion
       properties:
         domain:
-          $ref: '#/components/schemas/domain'
+          $ref: '#/components/schemas/Domain'
         specVersion:
           type: string
         userId:
-          $ref: '#/components/schemas/userId'
+          $ref: '#/components/schemas/UserId'
         tenantId:
-          $ref: '#/components/schemas/tenantId'
+          $ref: '#/components/schemas/TenantId'
         lifeCycle:
-          $ref: '#/components/schemas/eventLifeCycle'
-    domain:
+          $ref: '#/components/schemas/EventLifeCycle'
+    Domain:
       additionalProperties: false
       type: object
       required:
@@ -146,8 +208,8 @@ components:
         name:
           type: string
         subject:
-          $ref: '#/components/schemas/subject'
-    subject:
+          $ref: '#/components/schemas/Subject'
+    Subject:
       additionalProperties: false
       type: object
       required:
@@ -159,7 +221,7 @@ components:
           type: string
         revision:
           type: string
-    eventLifeCycle:
+    EventLifeCycle:
       additionalProperties: false
       type: object
       required:
@@ -172,16 +234,16 @@ components:
         source:
           type: string
         origination:
-          $ref: '#/components/schemas/origination'
+          $ref: '#/components/schemas/Origination'
         correlationId:
-          $ref: '#/components/schemas/correlationId'
+          $ref: '#/components/schemas/CorrelationId'
         chain:
           type: array
           items:
-            $ref: '#/components/schemas/eventLifeCycleChainItem'
+            $ref: '#/components/schemas/EventLifeCycleChainItem'
         isReplayed:
           type: boolean
-    eventLifeCycleChainItem:
+    EventLifeCycleChainItem:
       additionalProperties: false
       type: object
       required:
@@ -189,37 +251,37 @@ components:
         - sentAt
       properties:
         eventId:
-          $ref: '#/components/schemas/eventId'
+          $ref: '#/components/schemas/EventId'
         sentAt:
-          $ref: '#/components/schemas/sentAt'
-    eventId:
+          $ref: '#/components/schemas/SentAt'
+    EventId:
       type: string
       format: uuid
-    correlationId:
+    CorrelationId:
       type: string
       format: uuid
-    sentAt:
+    SentAt:
       type: string
       format: date-time
       description: Date and time when the message was sent.
-    userId:
+    UserId:
       type: string
       format: uuid
-    tenantId:
+    TenantId:
       type: string
       format: uuid
-    scope:
+    Scope:
       type: string
       enum:
         - domain
         - integration
-    origination:
+    Origination:
       type: string
       enum:
         - systemInvoked
         - registeredCommand
         - dataChanged
-    dataFormat:
+    DataFormat:
       additionalProperties: false
       type: object
       required:
