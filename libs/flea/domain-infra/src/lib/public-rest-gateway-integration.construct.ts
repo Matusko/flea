@@ -1,12 +1,10 @@
 import {Construct} from 'constructs';
 import {
-  AwsIntegration,
   CognitoUserPoolsAuthorizer,
   Deployment,
   IResource,
   LambdaIntegration, PassthroughBehavior
 } from 'aws-cdk-lib/aws-apigateway';
-import {Effect, Policy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {UserPool} from 'aws-cdk-lib/aws-cognito';
 import {IFunction} from 'aws-cdk-lib/aws-lambda';
 
@@ -14,10 +12,6 @@ export interface FleaEventStorePublicGatewayIntegrationProps {
   parentResource: IResource;
   domainResourcePath: string;
   stageName: string;
-  eventStore: {
-    tableName: string;
-    tableArn: string;
-  },
   userPoolId: string;
   corsHandler: IFunction;
   queryHandler: IFunction;
@@ -32,63 +26,6 @@ export class FleaEventStorePublicGatewayIntegration extends Construct {
     const authorizer = new CognitoUserPoolsAuthorizer(this, 'public-rest-gateway-authorizer', {
       cognitoUserPools: [userPool]
     });
-
-    const putEventPolicy = new Policy(this, 'putEventPolicy', {
-      statements: [
-        new PolicyStatement({
-          actions: ['dynamodb:PutItem'],
-          effect: Effect.ALLOW,
-          resources: [props.eventStore.tableArn],
-        }),
-      ],
-    });
-
-    const putEventRole = new Role(this, 'putEventRole', {
-      assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
-    });
-    putEventRole.attachInlinePolicy(putEventPolicy);
-/*
-    const putEventIntegration = new AwsIntegration({
-      action: 'PutItem',
-      options: {
-        credentialsRole: putEventRole,
-        integrationResponses: [
-          {
-            statusCode: '202',
-            responseTemplates: {
-              'application/json': `{
-                "requestId": "$context.requestId"
-              }`,
-            },
-            responseParameters: {
-              'method.response.header.Access-Control-Allow-Headers': "'Content-Type,Authorization'",
-              'method.response.header.Access-Control-Allow-Origin': "'http://localhost:4200'",
-              'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,PUT'",
-            },
-          },
-        ],
-        requestTemplates: {
-          'application/json': `{
-              "Item": {
-                "id": {
-                  "S": "$context.requestId"
-                },
-                "userId": {
-                  "S": "$context.authorizer.claims.sub"
-                },
-                "name": {
-                  "S": "$input.path('$.name')"
-                },
-                "type": {
-                  "S": "$input.path('$.type')"
-                }
-              },
-              "TableName": "${props.eventStore.tableName}"
-            }`,
-        },
-      },
-      service: 'dynamodb',
-    });*/
 
     const putEventIntegration = new LambdaIntegration(props.commandHandler,{
         proxy: false,

@@ -10,8 +10,8 @@ import {
 } from './read-model.construct';
 import {NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {Fn} from 'aws-cdk-lib';
-import {ITable} from 'aws-cdk-lib/aws-dynamodb';
 import {FleaCommandHandler, FleaCommandHandlerProps} from './command-handler.construct';
+import {FleaQueryHandler} from './query-handler.construct';
 
 export interface FleaDomainProps {
   name: string;
@@ -40,7 +40,6 @@ export class FleaDomain extends Construct {
     });
 
     const commandHandler = new FleaCommandHandler(this, 'command-handler', {
-      domainName: props.name,
       commandHandlerProps: props.commandHandlerProps,
       eventStoreTable: eventStore.table
     });
@@ -63,7 +62,6 @@ export class FleaDomain extends Construct {
     const readModel = new FleaReadModel(this, 'read-model', {
       tableName: props.readModelTableName,
       eventListenerProps: props.eventListenerProps,
-      queryHandlerProps: props.queryHandlerProps,
       eventBus: eventBus.bus,
       publicBus: {
         ...props.readModelPublicBusIntegrationProps,
@@ -71,17 +69,18 @@ export class FleaDomain extends Construct {
       },
     });
 
+    const queryHandler = new FleaQueryHandler(this, 'query-handler', {
+      queryHandlerProps: props.queryHandlerProps,
+      readModelTable: readModel.table
+    });
+
     new FleaEventStorePublicGatewayIntegration(this, 'event-store-integration', {
       parentResource: rootResource,
       domainResourcePath: props.domainResourcePath,
       stageName: 'prod',
-      eventStore: {
-        tableName: eventStore.table.tableName,
-        tableArn: eventStore.table.tableArn
-      },
       userPoolId,
       corsHandler,
-      queryHandler: readModel.queryHandler,
+      queryHandler: queryHandler.function,
       commandHandler: commandHandler.function
     });
 

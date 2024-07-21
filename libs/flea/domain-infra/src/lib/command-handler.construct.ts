@@ -5,7 +5,6 @@ import {Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {IFunction} from 'aws-cdk-lib/aws-lambda';
 
 export interface FleaCommandHandlerProps {
-  domainName: string;
   commandHandlerProps: NodejsFunctionProps;
   eventStoreTable: ITable;
 }

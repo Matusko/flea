@@ -53,12 +53,6 @@
         "command": "asyncapi generate fromTemplate libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml ./libs/flea/asyncapi-generator-typescript-cdk-event-bridge/dist/ -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out --force-write --param server=local\n"
       }
     },
-    "asyncapi-generate-models": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "asyncapi generate models typescript libs/flea/asyncapi-generator-typescript-cdk-event-bridge/src/lib/test-fixtures/test-hotel-asyncapi.yaml -o libs/flea/asyncapi-generator-typescript-cdk-event-bridge/gen.out\n"
-      }
-    },
     "asyncapi-validate": {
       "executor": "nx:run-commands",
       "options": {
